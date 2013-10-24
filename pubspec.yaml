@@ -1,0 +1,10 @@
+name: dullet_physics
+description: A Dart port of the turbolence bullet physics port
+dependencies:
+  vector_math:
+    git: https://github.com/johnmccutchan/vector_math.git
+dev_dependencies:
+  game_loop:
+    git: https://github.com/johnmccutchan/game_loop.git
+  spectre:
+    git: https://github.com/johnmccutchan/spectre.git
