@@ -1,4 +1,4 @@
-##Dullet Physics, a lightweight 3D physics Engine
+##Dullet Physics, a lightweight 3D Physics Engine
 __Warning__ Warning, this is currently not working correctly
 
 
