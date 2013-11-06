@@ -3,15 +3,8 @@ part of dullet_physics;
 // WebGL Physics Box Shape
 //
 class WebGLPhysicsBoxShape extends WebGLPhysicsShape {
-    //double margin;
-    //double radius;
-    //Vector3 halfExtents; // v3
-    //Vector3 inertia; // v3
-    //Vector3 center; // v3
-    //double collisionRadius;
-
     WebGLPhysicsBoxShape(Vector3 halfExtents, {double margin: 0.04}) {
-      //double margin = margin;
+      _margin = margin;
       //Vector3 halfExtents = halfExtents;
 
       var h0 = (halfExtents[0] + margin);
@@ -28,7 +21,7 @@ class WebGLPhysicsBoxShape extends WebGLPhysicsShape {
       _center = null;
 
       _radius = Math.sqrt((h0 * h0) + (h1 * h1) + (h2 * h2));
-      this._halfExtents = new Vector3(h0, h1, h2);
+      _halfExtents = new Vector3(h0, h1, h2);
       _inertia = new Vector3(
           (1.0 / 12.0) * (ly + lz),
           (1.0 / 12.0) * (lx + lz),
@@ -132,9 +125,9 @@ class WebGLPhysicsBoxShape extends WebGLPhysicsShape {
               new Vector3(o0 + d0 * minDistance,
                             o1 + d1 * minDistance,
                             o2 + d2 * minDistance),
-              new Vector3(axis == 0 ? (d0 > 0 ? -1 : 1.0) : 0.0,
-                            axis == 1 ? (d1 > 0 ? -1 : 1.0) : 0.0,
-                            axis == 2 ? (d2 > 0 ? -1 : 1.0) : 0.0),
+              new Vector3(axis == 0 ? (d0 > 0.0 ? -1.0 : 1.0) : 0.0,
+                            axis == 1 ? (d1 > 0.0 ? -1.0 : 1.0) : 0.0,
+                            axis == 2 ? (d2 > 0.0 ? -1.0 : 1.0) : 0.0),
               minDistance);
 
       } else {
@@ -147,7 +140,7 @@ class WebGLPhysicsBoxShape extends WebGLPhysicsShape {
         var v1 = vec.storage[1];
         var v2 = vec.storage[2];
 
-        var halfExtents = this._halfExtents;
+        var halfExtents = _halfExtents;
         var h0 = halfExtents.storage[0];
         var h1 = halfExtents.storage[1];
         var h2 = halfExtents.storage[2];

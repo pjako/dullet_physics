@@ -15,13 +15,13 @@ class WebGLPhysicsCapsuleShape extends WebGLPhysicsShape {
     //double margin;
 
 
-    WebGLPhysicsCapsuleShape({double height, double radius, double margin: 0.04}) {
+    WebGLPhysicsCapsuleShape({double height: 0.5, double radius: 0.5, double margin: 0.04}) {
 
 
         //var margin = margin;
         //var radius = param.radius;
         //var height = param.height;
-        double halfHeight = (0.5 * height);
+        halfHeight = (0.5 * height);
         double maxRadius = (radius + halfHeight);
 
         double h0 = (radius + margin);
@@ -39,7 +39,8 @@ class WebGLPhysicsCapsuleShape extends WebGLPhysicsShape {
 
         radius = maxRadius + margin;
         capsuleRadius = radius;
-        halfHeight = halfHeight;
+        _radius = capsuleRadius;
+        //halfHeight = halfHeight;
         _halfExtents = new Vector3(h0, h1, h2);
         _inertia = new Vector3(massRatio * (ly + lz),
                                   massRatio * (lx + lz),

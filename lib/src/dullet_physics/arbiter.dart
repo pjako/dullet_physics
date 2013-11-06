@@ -104,13 +104,12 @@ class WebGLPhysicsArbiter
         while (i < contacts.length) {
             WebGLPhysicsContact datad = contacts[i];
             // 0.9 chosen based on rough experimental results.
-            if ((!concave) && ((cn0 * datad[12]) + (cn1 * datad[13]) + (cn2 * datad[14])) < 0.9)
-            {
-                contacts[i] = contacts[contacts.length - 1];
-                contacts.removeLast();
-                WebGLPhysicsContact.deallocate(datad);
-                this.contactFlags |= 4; // removed
-                continue;
+            if ((!concave) && ((cn0 * datad[12]) + (cn1 * datad[13]) + (cn2 * datad[14])) < 0.9) {
+              contacts[i] = contacts[contacts.length - 1];
+              contacts.removeLast();
+              WebGLPhysicsContact.deallocate(datad);
+              this.contactFlags |= 4; // removed
+              continue;
             }
 
             //var dlocalA = d.localA;
@@ -118,23 +117,21 @@ class WebGLPhysicsArbiter
             d1 = (ca1 - datad[1]);
             d2 = (ca2 - datad[2]);
             var sep = (d0 * d0) + (d1 * d1) + (d2 * d2);
-            if (sep < WebGLPhysicsConfig.CONTACT_EQUAL_SQ_SEPERATION)
-            {
-                //c.jAccN = d.jAccN;
-                jAccN = datad[40];
-                contacts[i] = contacts[contacts.length - 1];
-                contacts.removeLast();
-                WebGLPhysicsContact.deallocate(datad);
-                this.contactFlags |= 4; // removed
-                min = sep;
-                continue;
+            if (sep < WebGLPhysicsConfig.CONTACT_EQUAL_SQ_SEPERATION) {
+              //c.jAccN = d.jAccN;
+              jAccN = datad[40];
+              contacts[i] = contacts[contacts.length - 1];
+              contacts.removeLast();
+              WebGLPhysicsContact.deallocate(datad);
+              this.contactFlags |= 4; // removed
+              min = sep;
+              continue;
             }
 
-            if (sep < WebGLPhysicsConfig.CONTACT_INHERIT_SQ_SEPERATION && sep < min)
-            {
-                //c.jAccN = d.jAccN;
-                jAccN = datad[40];
-                min = sep;
+            if (sep < WebGLPhysicsConfig.CONTACT_INHERIT_SQ_SEPERATION && sep < min) {
+              //c.jAccN = d.jAccN;
+              jAccN = datad[40];
+              min = sep;
             }
 
             i += 1;
@@ -169,18 +166,15 @@ class WebGLPhysicsArbiter
         // contact tangent.
         var ct0, /*ct1,*/ ct2;
         clsq = ((cn0 * cn0) + (cn2 * cn2));
-        if (clsq < WebGLPhysicsConfig.DONT_NORMALIZE_THRESHOLD)
-        {
-            data[15] = ct0 = 1.0;
-            data[16] = /*ct1 =*/ 0.0;
-            data[17] = ct2 = 0.0;
-        }
-        else
-        {
-            scale = 1.0 / Math.sqrt(clsq);
-            data[15] = ct0 = (-cn2 * scale);
-            data[16] = /*ct1 =*/ 0.0;
-            data[17] = ct2 = (cn0 * scale);
+        if (clsq < WebGLPhysicsConfig.DONT_NORMALIZE_THRESHOLD) {
+          data[15] = ct0 = 1.0;
+          data[16] = /*ct1 =*/ 0.0;
+          data[17] = ct2 = 0.0;
+        } else {
+          scale = 1.0 / Math.sqrt(clsq);
+          data[15] = ct0 = (-cn2 * scale);
+          data[16] = /*ct1 =*/ 0.0;
+          data[17] = ct2 = (cn0 * scale);
         }
 
         // contact bitangent
@@ -192,46 +186,38 @@ class WebGLPhysicsArbiter
 
         var contactCallbacks, publicContact;
         contactCallbacks = objectA._contactCallbacks;
-        if (null != contactCallbacks && 0 != (contactCallbacks.mask & objectB._group))
-        {
-            if (contactCallbacks.onPreSolveContact != null)
-            {
-                //publicContact = WebGLPhysicsContact._publicContacts[0];
-                //publicContact._private = data;
-                contactCallbacks.onPreSolveContact(objectA, objectB, cta);
-            }
-            if (!contactCallbacks.added && contactCallbacks.deferred)
-            {
-                contactCallbacks.added = true;
-                objectA._world._contactCallbackObjects.add(objectA);
-            }
-            if (contactCallbacks.trigger)
-            {
-                this.trigger = true;
-                objectA._sweepFrozen = false;
-                objectB._sweepFrozen = false;
-            }
+        if (null != contactCallbacks && 0 != (contactCallbacks.mask & objectB._group)) {
+          if (contactCallbacks.onPreSolveContact != null) {
+            publicContact = WebGLPhysicsContact._publicContacts[0];
+            publicContact._private = data;
+            contactCallbacks.onPreSolveContact(objectA, objectB, cta);
+          }
+          if (!contactCallbacks.added && contactCallbacks.deferred) {
+            contactCallbacks.added = true;
+            objectA._world._contactCallbackObjects.add(objectA);
+          }
+          if (contactCallbacks.trigger) {
+            this.trigger = true;
+            objectA._sweepFrozen = false;
+            objectB._sweepFrozen = false;
+          }
         }
         contactCallbacks = objectB._contactCallbacks;
-        if (null != contactCallbacks && 0 != (contactCallbacks.mask & objectA._group))
-        {
-            if (contactCallbacks.onPreSolveContact != null)
-            {
-                //publicContact = WebGLPhysicsContact._publicContacts[0];
-                //publicContact._private = data;
-                contactCallbacks.onPreSolveContact(objectA, objectB, cta);
-            }
-            if (!contactCallbacks.added && contactCallbacks.deferred)
-            {
-                contactCallbacks.added = true;
-                objectB._world._contactCallbackObjects.push(objectB);
-            }
-            if (contactCallbacks.trigger)
-            {
-                this.trigger = true;
-                objectA._sweepFrozen = false;
-                objectB._sweepFrozen = false;
-            }
+        if (null != contactCallbacks && 0 != (contactCallbacks.mask & objectA._group)) {
+          if (contactCallbacks.onPreSolveContact != null) {
+            publicContact = WebGLPhysicsContact._publicContacts[0];
+            publicContact._private = data;
+            contactCallbacks.onPreSolveContact(objectA, objectB, cta);
+          }
+          if (!contactCallbacks.added && contactCallbacks.deferred) {
+            contactCallbacks.added = true;
+            objectB._world._contactCallbackObjects.push(objectB);
+          }
+          if (contactCallbacks.trigger) {
+            this.trigger = true;
+            objectA._sweepFrozen = false;
+            objectB._sweepFrozen = false;
+          }
         }
 
         this.contactFlags |= 1; // added
@@ -506,7 +492,7 @@ class WebGLPhysicsArbiter
       var B7 = I.storage[7];
       var B8 = I.storage[8];
 
-      var activeContacts = this.activeContacts;
+      //var activeContacts = this.activeContacts;
       activeContacts.clear();
 
       // TOOD: REMOVE the <any> casts.  objectA appears to be a
@@ -1039,7 +1025,7 @@ class WebGLPhysicsArbiter
         arbiter.skipDiscreteCollisions = false;
 
         // clear contact information
-        arbiter.activeContacts.length = 0;
+        arbiter.activeContacts.clear();
         arbiter.contactFlags = 0;
         arbiter.trigger = false;
         arbiterPool.add(arbiter);

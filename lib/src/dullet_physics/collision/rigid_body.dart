@@ -8,13 +8,9 @@ part of dullet_physics;
 
 // TODO: inherit from WebGLPhysicsCollisionObject
 
-class WebGLPhysicsRigidBody extends WebGLPhysicsCollisionObject /*implements PhysicsRigidBody*/ {
+class WebGLPhysicsRigidBody extends WebGLPhysicsPrivateBody /*implements PhysicsRigidBody*/ {
     static const int version = 1;
-
-    double wakeTimeStamp;
-    WebGLPhysicsIsland island;
-    List<WebGLPhysicsArbiter> arbiters;
-
+    dynamic userData;
     bool get active => _active;
     void set active(bool active_) {
       var pr = this;
@@ -159,7 +155,7 @@ class WebGLPhysicsRigidBody extends WebGLPhysicsCollisionObject /*implements Phy
     //Float32List inertia; // v3
 
     //WebGLPhysicsPrivateBody _private;
-    dynamic userData;
+
 
     WebGLPhysicsShape get shape => _shape;
 
@@ -187,7 +183,7 @@ class WebGLPhysicsRigidBody extends WebGLPhysicsCollisionObject /*implements Phy
           restitution: restitution,
           linearDamping: linearDamping,
           angularDamping: angularDamping,
-          //frozen: frozen,
+          //frozen: _frozen,
           active: active
           //fixedRotation: fixedRotation,
           //permitSleep: permitSleep,
@@ -223,14 +219,14 @@ class WebGLPhysicsRigidBody extends WebGLPhysicsCollisionObject /*implements Phy
       ContactCallback onProcessedContacts,
       ContactCallback onRemovedContacts}) : super(
           //WebGLPhysicsCollisionObject publicObject,
-          shape: shape,
-          transform: transform,
-          linearVelocity: linearVelocity,
-          angularVelocity: angularVelocity,
-          friction: friction,
-          restitution: restitution,
-          linearDamping: linearDamping,
-          angularDamping: angularDamping) {
+          shape,
+          transform,
+          linearVelocity,
+          angularVelocity,
+          friction,
+          restitution,
+          linearDamping,
+          angularDamping) {
         var retr = this;
         //retr._private = r;
         if(inertia != null) {
@@ -244,35 +240,33 @@ class WebGLPhysicsRigidBody extends WebGLPhysicsCollisionObject /*implements Phy
         // ------------------------------
         // initialise private properties of RigidBody.
 
-        r._group = group;
-        r._mask = mask;
+        _group = group;
+        _mask = mask;
+        _active = (active != null) ? active : (frozen != null) ? (frozen) : true;
 
-        r._active = (active != null) ? active :
-            (frozen != null) ? (frozen) : true;
+        _kinematic = kinematic;
+        _fixedRotation = kinematic || fixedRotation;
 
-        r._kinematic = kinematic;
-        r._fixedRotation = kinematic || fixedRotation;
+        _inverseInertiaLocal = (r._fixedRotation ? new Vector3.zero() : new Vector3(1.0 / inertia[0], 1.0 / inertia[1], 1.0 / inertia[2]));
+        _inverseInertia = new Matrix3.identity();//MathHelper.m33BuildIdentity();
 
-        r._inverseInertiaLocal = (r._fixedRotation ? new Vector3.zero() : new Vector3(1.0 / inertia[0], 1.0 / inertia[1], 1.0 / inertia[2]));
-        r._inverseInertia = new Matrix3.identity();//MathHelper.m33BuildIdentity();
+        _mass = mass;
+        _inverseMass = (kinematic ? 0.0 : (1.0 / r.mass));
 
-        r._mass = mass;
-        r._inverseMass = (kinematic ? 0.0 : (1.0 / r.mass));
-
-        r._collisionObject = false;
+        _collisionObject = false;
 
         // Kinematic object is not permitted to sleep in the normal sense.
-        r._permitSleep = (permitSleep != null) ? permitSleep : (!kinematic);
+        _permitSleep = (permitSleep != null) ? permitSleep : (!kinematic);
 
         // Kinematic object is not subject to manipulation by continous collisions.
-        r._sweepFrozen = kinematic;
+        _sweepFrozen = kinematic;
 
         // prepare for contact callbacks
         if (onPreSolveContact != null ||
             onAddedContacts != null ||
             onProcessedContacts != null ||
             onRemovedContacts != null) {
-            r._contactCallbacks = new WebGLPhysicsContactCallbacks(
+            _contactCallbacks = new WebGLPhysicsContactCallbacks(
                 mask: mask,
                 trigger: false,
                 onAddedContacts: onAddedContacts,
@@ -282,7 +276,7 @@ class WebGLPhysicsRigidBody extends WebGLPhysicsCollisionObject /*implements Phy
 
                 );
         } else {
-            r._contactCallbacks = null;
+            _contactCallbacks = null;
         }
 
         //return retr;

@@ -8,7 +8,7 @@ import 'package:vector_math/vector_math.dart';
 
 const double collisionMargin = 0.005;
 const double mass = 20.0;
-const int numCubes = 200;
+const int numCubes = 50;
 
 WebGLPhysicsWorld world;
 WebGLPhysicsCollisionObject obj;
@@ -204,9 +204,9 @@ void initDbullet() {
 
   world.addCollisionObject(floorObject);
 
-  var boxShape = new WebGLPhysicsBoxShape(cubeExtents,
-    //halfExtents : cubeExtents,
-    margin : collisionMargin
+  var boxShape = new WebGLPhysicsBoxShape(
+      cubeExtents,
+      margin : collisionMargin
   );
 
   var inertia = boxShape.inertia.scale(mass);
@@ -228,6 +228,7 @@ void initDbullet() {
   for (var n = 1; n < numCubes; n += 1) {
     // Each additional box is cloned from the original
     var newBox = prb.clone();
+    newBox.userData = n;
     boxBodies.add(newBox);
     newBox.transform = new Matrix43.fromTranslation(0.0, 1.0 + 1.5 * n, 0.0);
     world.addRigidBody(newBox);

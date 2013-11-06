@@ -17,10 +17,10 @@ class WebGLPhysicsPrivateBody implements ExternalAabbTreeNode {
 
     // set by initPrivateBody()
     WebGLPhysicsWorld _world;
-    WebGLPhysicsShape _shape;
-    double _friction;
-    double _restitution;
-    Matrix43 _transform;                   // m43
+    final WebGLPhysicsShape _shape;
+    double _friction = 0.5;
+    double _restitution = 0.0;
+    final Matrix43 _transform = new Matrix43.identity();                   // m43
     void set transform(Matrix43 t) {
       t.copyInto(_transform);
     }
@@ -52,35 +52,47 @@ class WebGLPhysicsPrivateBody implements ExternalAabbTreeNode {
 
 
 
-    List<WebGLPhysicsArbiter> _arbiters;  // TODO:
-    List _constraints;               // TODO:
-    Matrix43 _velocity;           // length 12
-    double _linearDamping;
-    double _angularDamping;
-    Aabb3 _extents;            // length 6
-    Matrix43 _startTransform;              // m43
-    Matrix43 _endTransform;                // m43
-    Matrix43 _prevTransform;               // m43
-    Matrix43 _newTransform;                // m43
+    final List<WebGLPhysicsArbiter> _arbiters = new List<WebGLPhysicsArbiter>();  // TODO:
+    // Tracks constraints that are inside of a space, and making use of this object.
+    // We only track these constraints to avoid GC issues.
+    final List _constraints = [];               // TODO:
+
+    // [v0, v1, v2]
+    // [w0, w1, w2]
+    // [v0, v1, v2] <-- bias velocity
+    // [w0, w1, w2] <-- bias velocity
+    final Matrix43 _velocity = new Matrix43();
+    double _linearDamping = 0.0;
+    double _angularDamping = 0.0;
+    final Aabb3 _extents = new Aabb3();
+
+    // For continous collision detection
+    final Matrix43 _startTransform = new Matrix43.identity();              // m43
+    final Matrix43 _endTransform = new Matrix43.identity();                // m43
+    // For kinematic objects.
+    final Matrix43 _prevTransform = new Matrix43.identity();               // m43
+    final Matrix43 _newTransform = new Matrix43.identity();                // m43
     WebGLPhysicsIsland _island;
     WebGLPhysicsPrivateBody _islandRoot;
-    int _islandRank;
-    bool _delaySleep;
+    int _islandRank = 0;
+    // used for kinematics so that it is kept alive for a single
+    // step before being sweffed.
+    bool _delaySleep = true;
     double _wakeTimeStamp;
 
     // set by RigidBody and CollisionObject constructors
-    int _group;
-    int _mask;
-    bool _kinematic;
-    bool _fixedRotation;
-    double _mass;
-    double _inverseMass;
+    int _group = 0;
+    int _mask = 0;
+    bool _kinematic = false;
+    bool _fixedRotation = false;
+    double _mass = 0.0;
+    double _inverseMass = 0.0;
     Vector3 _inverseInertiaLocal; // v3
     Matrix3 _inverseInertia;
-    bool _collisionObject = true;
-    bool _permitSleep;
-    bool _sweepFrozen;
-    bool _active;
+    bool _collisionObject = false;
+    bool _permitSleep = false;
+    bool _sweepFrozen = false;
+    bool _active = false;
     //contactCallbacksMask: number;
     //addedToContactCallbacks: boolean;
 
@@ -89,90 +101,33 @@ class WebGLPhysicsPrivateBody implements ExternalAabbTreeNode {
     //TODO: Make this private
     static int uniqueId = 0;
 
-    WebGLPhysicsPrivateBody({
-      //WebGLPhysicsCollisionObject publicObject,
-      WebGLPhysicsShape shape,
-      Matrix43 transform,
-      Vector3 linearVelocity,
-      Vector3 angularVelocity,
-      double friction: 0.5,
-      double restitution: 0.0,
-      double linearDamping: 0.0,
-      double angularDamping: 0.0
-      }) {
-        //this._public = publicObject;
 
+    WebGLPhysicsPrivateBody(this._shape,
+        Matrix43 transform,
+        Vector3 linearVelocity,
+        Vector3 angularVelocity,
+        this._friction,
+        this._restitution,
+        this._linearDamping,
+        this._angularDamping) {
         this._id = WebGLPhysicsPrivateBody.uniqueId;
         WebGLPhysicsPrivateBody.uniqueId += 1;
-
-        this._world = null;
-        this._shape = shape;
-
-        this._friction    = friction;
-        this._restitution = restitution;
-        _linearDamping = linearDamping;
-        _angularDamping = angularDamping;
-
-        var xform = transform;
-        this._transform = (xform != null ? xform.clone() : new Matrix43.identity());
-
-        this._arbiters = [];
-        // Tracks constraints that are inside of a space, and making use of this object.
-        // We only track these constraints to avoid GC issues.
-        this._constraints = [];
-
-        // [v0, v1, v2]
-        // [w0, w1, w2]
-        // [v0, v1, v2] <-- bias velocity
-        // [w0, w1, w2] <-- bias velocity
-        this._velocity = new Matrix43();
+        if(transform != null) {
+          transform.copyInto(_transform);
+        }
         var vel = linearVelocity;
         if (vel != null) {
-            this._velocity.storage[0] = vel.storage[0];
-            this._velocity.storage[1] = vel.storage[1];
-            this._velocity.storage[2] = vel.storage[2];
+            _velocity.storage[0] = vel.storage[0];
+            _velocity.storage[1] = vel.storage[1];
+            _velocity.storage[2] = vel.storage[2];
         }
         vel = angularVelocity;
         if (vel != null) {
-            this._velocity.storage[3] = vel.storage[0];
-            this._velocity.storage[4] = vel.storage[1];
-            this._velocity.storage[5] = vel.storage[2];
+            _velocity.storage[3] = vel.storage[0];
+            _velocity.storage[4] = vel.storage[1];
+            _velocity.storage[5] = vel.storage[2];
         }
-
-        //this.linearDamping  = (params.linearDamping  != null) ? params.linearDamping  : 0.0;
-        //this.angularDamping = (params.angularDamping != null) ? params.angularDamping : 0.0;
-
-        this._extents = new Aabb3();
-
-        // For continous collision detection
-        this._startTransform = new Matrix43.identity();
-        this._endTransform = new Matrix43.identity();
-
-        // For kinematic objects.
-        this._prevTransform = _transform.clone();
-        this._newTransform = new Matrix43.identity();
-
-        this._island = null;
         this._islandRoot = this;
-        this._islandRank = 0;
-
-        // used for kinematics so that it is kept alive for a single
-        // step before being sweffed.
-        this._delaySleep = true;
-
-        this._group = 0;
-        this._mask = 0;
-        this._kinematic = false;
-        this._fixedRotation = false;
-        this._mass = 0.0;
-        this._inverseMass = 0.0;
-        this._inverseInertiaLocal = null;
-        this._inverseInertia = null;
-        this._collisionObject = false;
-        this._permitSleep = false;
-        this._sweepFrozen = false;
-        this._active = false;
-        this._contactCallbacks = null;
     }
 
     // Used for kinematics.
@@ -612,3 +567,42 @@ class WebGLPhysicsPrivateBody implements ExternalAabbTreeNode {
         return ((this._wakeTimeStamp + WebGLPhysicsConfig.SLEEP_DELAY) > this._world._timeStamp);
     }
 }
+
+
+
+/*
+ * from the constructor
+ *
+this._world = null;
+this._shape = shape;
+
+this._friction    = friction;
+this._restitution = restitution;
+_linearDamping = linearDamping;
+_angularDamping = angularDamping;
+
+
+
+//this.linearDamping  = (params.linearDamping  != null) ? params.linearDamping  : 0.0;
+//this.angularDamping = (params.angularDamping != null) ? params.angularDamping : 0.0;
+
+//this._extents = new Aabb3();
+
+
+this._island = null;
+this._islandRank = 0;
+this._delaySleep = true;
+this._group = 0;
+this._mask = 0;
+this._kinematic = false;
+this._fixedRotation = false;
+this._mass = 0.0;
+this._inverseMass = 0.0;
+this._inverseInertiaLocal = null;
+this._inverseInertia = null;
+this._collisionObject = false;
+this._permitSleep = false;
+this._sweepFrozen = false;
+this._active = false;
+this._contactCallbacks = null;
+*/

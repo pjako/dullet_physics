@@ -486,28 +486,24 @@ class WebGLPhysicsWorld /*implements PhysicsWorld*/ {
 
         var i = 0;
         var numArbiters = arbiters.length;
-        for (i = 0; i < numArbiters; i += 1)
-        {
-            var carb = arbiters[i];
-            if (carb.shapeA == shapeA && carb.shapeB == shapeB &&
-                carb.objectA == objectA && carb.objectB == objectB)
-            {
-                arb = carb;
-                break;
-            }
+        for (i = 0; i < numArbiters; i += 1) {
+          var carb = arbiters[i];
+          if (carb.shapeA == shapeA && carb.shapeB == shapeB &&
+              carb.objectA == objectA && carb.objectB == objectB) {
+            arb = carb;
+            break;
+          }
         }
 
-        if (arb != null && arb.skipDiscreteCollisions)
-        {
-            arb.skipDiscreteCollisions = false;
-            return;
+        if (arb != null && arb.skipDiscreteCollisions) {
+          arb.skipDiscreteCollisions = false;
+          return;
         }
 
         // If arbiter does not already exist, create a new one.
         bool fresh = (arb == null);
-        if (fresh)
-        {
-            arb = WebGLPhysicsArbiter.allocate(shapeA, shapeB, objectA, objectB);
+        if (fresh) {
+          arb = WebGLPhysicsArbiter.allocate(shapeA, shapeB, objectA, objectB);
         }
 
         var cache = this._narrowCache;
@@ -515,14 +511,11 @@ class WebGLPhysicsWorld /*implements PhysicsWorld*/ {
         cache.shapeB = shapeB;
 
         // 'warm-start' contact solver with a guess direction of MTV
-        if (arb.contacts.length != 0)
-        {
-            //var basis = arb.contacts[0].basis;
-            var data = arb.contacts[0];
-            // VMath.v3Copy(c.normal, cache.axis);
-            cache.axis[0] = data[12];
-            cache.axis[1] = data[13];
-            cache.axis[2] = data[14];
+        if (arb.contacts.length != 0) {
+          var data = arb.contacts[0];
+          cache.axis[0] = data[12];
+          cache.axis[1] = data[13];
+          cache.axis[2] = data[14];
         }
 
         var contact;
@@ -531,96 +524,93 @@ class WebGLPhysicsWorld /*implements PhysicsWorld*/ {
         //
         // Special case for triangle meshes.
         //
-        if (shapeA is WebGLPhysicsTriangleMeshShape/*.type == "TRIANGLE_MESH"*/
-            || shapeB is WebGLPhysicsTriangleMeshShape /*.type == "TRIANGLE_MESH"*/) {
-            WebGLPhysicsTriangleMeshShape meshShape;
-            WebGLPhysicsShape otherShape;
-            Matrix43 meshXForm, otherXForm;
-            var triangle = this._narrowTriangle;
-            var cache2 = this._narrowCache2;
+                       /*.type == "TRIANGLE_MESH"*/               /*.type == "TRIANGLE_MESH"*/
+        if (shapeA is WebGLPhysicsTriangleMeshShape || shapeB is WebGLPhysicsTriangleMeshShape ) {
+          WebGLPhysicsTriangleMeshShape meshShape;
+          WebGLPhysicsShape otherShape;
+          Matrix43 meshXForm, otherXForm;
+          var triangle = this._narrowTriangle;
+          var cache2 = this._narrowCache2;
 
-            if (shapeA is WebGLPhysicsTriangleMeshShape/*.type == "TRIANGLE_MESH"*/) {
-                meshShape = shapeA;
-                meshXForm = objectA._transform;
-                otherShape = shapeB;
-                otherXForm = objectB._transform;
-                cache2.shapeA = triangle;
-                cache2.shapeB = cache.shapeB;
-            } else {
-                meshShape = shapeB;
-                meshXForm = objectB._transform;
-                otherShape = shapeA;
-                otherXForm = objectA._transform;
-                cache2.shapeA = cache.shapeA;
-                cache2.shapeB = triangle;
-            }
+          if (shapeA is WebGLPhysicsTriangleMeshShape/*.type == "TRIANGLE_MESH"*/) {
+            meshShape = shapeA;
+            meshXForm = objectA._transform;
+            otherShape = shapeB;
+            otherXForm = objectB._transform;
+            cache2.shapeA = triangle;
+            cache2.shapeB = cache.shapeB;
+          } else {
+            meshShape = shapeB;
+            meshXForm = objectB._transform;
+            otherShape = shapeA;
+            otherXForm = objectA._transform;
+            cache2.shapeA = cache.shapeA;
+            cache2.shapeB = triangle;
+          }
 
-            WebGLPhysicsTriangleArray triangleArray = meshShape.triangleArray;
-            triangle.triangleArray = triangleArray;
-            triangle.collisionRadius = meshShape._collisionRadius;
+          WebGLPhysicsTriangleArray triangleArray = meshShape.triangleArray;
+          triangle.triangleArray = triangleArray;
+          triangle.collisionRadius = meshShape._collisionRadius;
 
-            int numTriangles;
+          int numTriangles;
 
-            if (triangleArray.spatialMap != null) {
-                // determine AABB of non-triangle mesh object in local coordinates
-                // of triangle mesh.
-                var transform = this._narrowTransform;
-                var fakeBody = this._narrowFakeBody;
-                var extents = this._narrowExtents;
+          if (triangleArray.spatialMap != null) {
+            // determine AABB of non-triangle mesh object in local coordinates
+            // of triangle mesh.
+            var transform = this._narrowTransform;
+            var fakeBody = this._narrowFakeBody;
+            var extents = this._narrowExtents;
 
-                //---var itransform = VMath.m43InverseOrthonormal(meshXForm);
+            //---var itransform = VMath.m43InverseOrthonormal(meshXForm);
 
-                //VMath.m43InverseOrthonormal(meshXForm, transform);
-                meshXForm.inverseOrthonormal(transform);
+            //VMath.m43InverseOrthonormal(meshXForm, transform);
+            meshXForm.inverseOrthonormal(transform);
 
-                //VMath.m43Mul(otherXForm, transform, fakeBody._transform);
-                otherXForm.multiply(transform, fakeBody._transform);
-                fakeBody._shape = otherShape;
-                /*WebGLPhysicsPrivateBody.calculateExtents.call*/
-                calculateExtents(fakeBody, extents);
+            //VMath.m43Mul(otherXForm, transform, fakeBody._transform);
+            otherXForm.multiply(transform, fakeBody._transform);
+            fakeBody._shape = otherShape;
+            /*WebGLPhysicsPrivateBody.calculateExtents.call*/
+            calculateExtents(fakeBody, extents);
 
-                // Find all triangles to test against.
-                var triangles = this._persistantTrianglesList;
-                numTriangles = triangleArray.spatialMap.getOverlappingNodes(extents, triangles, 0);
-                for (i = 0; i < numTriangles; i += 1) {
-                    var index = triangles[i].index;
-                    triangle.index = index;
-                    // Prevent GC issues from object being kept in persistent array
-                    triangles[i] = null;
+            // Find all triangles to test against.
+            var triangles = this._persistantTrianglesList;
+            numTriangles = triangleArray.spatialMap.getOverlappingNodes(extents, triangles, 0);
+            for (i = 0; i < numTriangles; i += 1) {
+              var index = triangles[i].index;
+              triangle.index = index;
+              // Prevent GC issues from object being kept in persistent array
+              triangles[i] = null;
 
-                    // Shortcut! Check that shape intersects plane of triangle
-                    if (!this._trianglePlaneDiscard(otherShape, otherXForm, triangleArray, index, meshXForm)) {
-                        contact = this._contactPairTest(cache2, objectA._transform, objectB._transform);
-                        if (contact < 0) {
-                            arb.insertContact(cache2.closestA, cache2.closestB, cache2.axis, contact, true);
-                            collided = true;
-                        }
-                    }
+              // Shortcut! Check that shape intersects plane of triangle
+              if (!this._trianglePlaneDiscard(otherShape, otherXForm, triangleArray, index, meshXForm)) {
+                contact = _contactPairTest(cache2, objectA._transform, objectB._transform);
+                if (contact < 0) {
+                  arb.insertContact(cache2.closestA, cache2.closestB, cache2.axis, contact, true);
+                  collided = true;
                 }
-            } else {
-                // If triangle mesh is small, no AABBTree exists
-                // And we check all triangles brute-force.
-                numTriangles = triangleArray.numTriangles;
-                for (i = 0; i < numTriangles; i += 1)
-                {
-                    triangle.index = (i * WebGLPhysicsPrivateTriangleArray.TRIANGLE_SIZE);
-                    if (!this._trianglePlaneDiscard(otherShape, otherXForm, triangleArray, triangle.index, meshXForm))
-                    {
-                        contact = this._contactPairTest(cache2, objectA._transform, objectB._transform);
-                        if (contact < 0)
-                        {
-                            arb.insertContact(cache2.closestA, cache2.closestB, cache2.axis, contact, true);
-                            collided = true;
-                        }
-                    }
-                }
+              }
             }
+          } else {
+            // If triangle mesh is small, no AABBTree exists
+            // And we check all triangles brute-force.
+            numTriangles = triangleArray.numTriangles;
+            for (i = 0; i < numTriangles; i += 1) {
+              triangle.index = (i * WebGLPhysicsPrivateTriangleArray.TRIANGLE_SIZE);
+              if (!this._trianglePlaneDiscard(otherShape, otherXForm, triangleArray, triangle.index, meshXForm)) {
+                contact = _contactPairTest(cache2, objectA._transform, objectB._transform);
+                if (contact < 0) {
+                  arb.insertContact(cache2.closestA, cache2.closestB, cache2.axis, contact, true);
+                  collided = true;
+                }
+              }
+            }
+          }
         } else { // Default case, both objects are convex.
-            contact = this._contactPairTest(cache, objectA._transform, objectB._transform);
-            if (contact < 0) {
-                arb.insertContact(cache.closestA, cache.closestB, cache.axis, contact, false);
-                collided = true;
-            }
+          contact = _contactPairTest(cache, objectA._transform, objectB._transform);
+          if (contact < 0.0) {
+            arb.insertContact(cache.closestA, cache.closestB, cache.axis, contact, false);
+            collided = true;
+          }
         }
 
         if (collided) {
@@ -811,8 +801,8 @@ class WebGLPhysicsWorld /*implements PhysicsWorld*/ {
                 maxN = island._bodies.length;
                 for (n = 0; n < maxN; n += 1) {
                     body = island._bodies[n];
-                    body._velocity[0] = body._velocity[1] = body._velocity[2] = 0;
-                    body._velocity[3] = body._velocity[4] = body._velocity[5] = 0;
+                    body._velocity[0] = body._velocity[1] = body._velocity[2] = 0.0;
+                    body._velocity[3] = body._velocity[4] = body._velocity[5] = 0.0;
                     body._active = false;
                     this._syncBody(body);
 
@@ -1589,11 +1579,11 @@ class WebGLPhysicsWorld /*implements PhysicsWorld*/ {
                 {
                     if (objectA._id < objectB._id)
                     {
-                        this._narrowPhase(objectA._shape, objectB._shape, objectA, objectB);
+                        _narrowPhase(objectA._shape, objectB._shape, objectA, objectB);
                     }
                     else
                     {
-                        this._narrowPhase(objectB._shape, objectA._shape, objectB, objectA);
+                        _narrowPhase(objectB._shape, objectA._shape, objectB, objectA);
                     }
                 }
             }
@@ -2245,202 +2235,197 @@ class WebGLPhysicsWorld /*implements PhysicsWorld*/ {
     //      axis is 'on' object B.
     //   closestA <-- to be populated by this function
     //   closestB <-- to be populated by this function
-    _contactPairTest(WebGLPhysicsTOIEvent cache, Matrix43 xformA, Matrix43 xformB)
-    {
+    _contactPairTest(WebGLPhysicsTOIEvent cache, Matrix43 xformA, Matrix43 xformB) {
         var axis = cache.axis;
         var shapeA = cache.shapeA;
         var shapeB = cache.shapeB;
         var supportA = cache.closestA;
         var supportB = cache.closestB;
 
-        if (this._contactGJK == null)
-        {
-            this._contactGJK = new WebGLGJKContactSolver();
-            this._contactEPA = new WebGLContactEPA();
+        if (_contactGJK == null) {
+          _contactGJK = new WebGLGJKContactSolver();
+          _contactEPA = new WebGLContactEPA();
         }
 
         //
         // Special case for planes
         //
-        if (shapeA is WebGLPhysicsPlaneShape/*.type == "PLANE"*/ || shapeB is WebGLPhysicsPlaneShape /*.type == "PLANE"*/)
-        {
-            WebGLPhysicsPlaneShape planeShape;
-            WebGLPhysicsShape otherShape;
-            Matrix43 planeXForm, otherXForm;
-            if (shapeA is WebGLPhysicsPlaneShape/*.type == "PLANE"*/) {
-                planeShape = shapeA;
-                planeXForm = xformA;
-                otherShape = shapeB;
-                otherXForm = xformB;
-            } else {
-                planeShape = shapeB;
-                planeXForm = xformB;
-                otherShape = shapeA;
-                otherXForm = xformA;
-            }
+                        /*.type == "PLANE"*/               /*.type == "PLANE"*/
+        if (shapeA is WebGLPhysicsPlaneShape || shapeB is WebGLPhysicsPlaneShape) {
+          WebGLPhysicsPlaneShape planeShape;
+          WebGLPhysicsShape otherShape;
+          Matrix43 planeXForm, otherXForm;
+                          /*.type == "PLANE"*/
+          if (shapeA is WebGLPhysicsPlaneShape) {
+              planeShape = shapeA;
+              planeXForm = xformA;
+              otherShape = shapeB;
+              otherXForm = xformB;
+          } else {
+              planeShape = shapeB;
+              planeXForm = xformB;
+              otherShape = shapeA;
+              otherXForm = xformA;
+          }
 
-            var A0 = planeXForm.storage[0];
-            var A1 = planeXForm.storage[1];
-            var A2 = planeXForm.storage[2];
-            var A3 = planeXForm.storage[3];
-            var A4 = planeXForm.storage[4];
-            var A5 = planeXForm.storage[5];
-            var A6 = planeXForm.storage[6];
-            var A7 = planeXForm.storage[7];
-            var A8 = planeXForm.storage[8];
-            var A9 = planeXForm.storage[9];
-            var A10 = planeXForm.storage[10];
-            var A11 = planeXForm.storage[11];
+          var A0 = planeXForm.storage[0];
+          var A1 = planeXForm.storage[1];
+          var A2 = planeXForm.storage[2];
+          var A3 = planeXForm.storage[3];
+          var A4 = planeXForm.storage[4];
+          var A5 = planeXForm.storage[5];
+          var A6 = planeXForm.storage[6];
+          var A7 = planeXForm.storage[7];
+          var A8 = planeXForm.storage[8];
+          var A9 = planeXForm.storage[9];
+          var A10 = planeXForm.storage[10];
+          var A11 = planeXForm.storage[11];
 
-            // local plane normal and distance.
-            var n = planeShape.normal;
-            var n0 = n.storage[0];
-            var n1 = n.storage[1];
-            var n2 = n.storage[2];
-            var nd = planeShape.distance;
+          // local plane normal and distance.
+          var n = planeShape.normal;
+          var n0 = n.storage[0];
+          var n1 = n.storage[1];
+          var n2 = n.storage[2];
+          var nd = planeShape.distance;
 
-            // transform plane normal into world space.
-            var w0 = (n0 * A0) + (n1 * A3) + (n2 * A6);
-            var w1 = (n0 * A1) + (n1 * A4) + (n2 * A7);
-            var w2 = (n0 * A2) + (n1 * A5) + (n2 * A8);
+          // transform plane normal into world space.
+          var w0 = (n0 * A0) + (n1 * A3) + (n2 * A6);
+          var w1 = (n0 * A1) + (n1 * A4) + (n2 * A7);
+          var w2 = (n0 * A2) + (n1 * A5) + (n2 * A8);
 
-            A0 = otherXForm.storage[0];
-            A1 = otherXForm.storage[1];
-            A2 = otherXForm.storage[2];
-            A3 = otherXForm.storage[3];
-            A4 = otherXForm.storage[4];
-            A5 = otherXForm.storage[5];
-            A6 = otherXForm.storage[6];
-            A7 = otherXForm.storage[7];
-            A8 = otherXForm.storage[8];
-            var B9 = otherXForm.storage[9];
-            var B10 = otherXForm.storage[10];
-            var B11 = otherXForm.storage[11];
+          A0 = otherXForm.storage[0];
+          A1 = otherXForm.storage[1];
+          A2 = otherXForm.storage[2];
+          A3 = otherXForm.storage[3];
+          A4 = otherXForm.storage[4];
+          A5 = otherXForm.storage[5];
+          A6 = otherXForm.storage[6];
+          A7 = otherXForm.storage[7];
+          A8 = otherXForm.storage[8];
+          var B9 = otherXForm.storage[9];
+          var B10 = otherXForm.storage[10];
+          var B11 = otherXForm.storage[11];
 
-            // transform plane into shape local space.
-            n0 = (A0 * w0) + (A1 * w1) + (A2 * w2);
-            n1 = (A3 * w0) + (A4 * w1) + (A5 * w2);
-            n2 = (A6 * w0) + (A7 * w1) + (A8 * w2);
-            nd += (w0 * (A9 - B9)) + (w1 * (A10 - B10)) + (w2 * (A11 - B11));
+          // transform plane into shape local space.
+          n0 = (A0 * w0) + (A1 * w1) + (A2 * w2);
+          n1 = (A3 * w0) + (A4 * w1) + (A5 * w2);
+          n2 = (A6 * w0) + (A7 * w1) + (A8 * w2);
+          nd += (w0 * (A9 - B9)) + (w1 * (A10 - B10)) + (w2 * (A11 - B11));
 
-            // Find maximum and minimal support points on shape.
-            axis[0] = n0;
-            axis[1] = n1;
-            axis[2] = n2;
-            otherShape.localSupportWithoutMargin(axis, supportA);
+          // Find maximum and minimal support points on shape.
+          axis[0] = n0;
+          axis[1] = n1;
+          axis[2] = n2;
+          otherShape.localSupportWithoutMargin(axis, supportA);
 
-            axis[0] = -n0;
-            axis[1] = -n1;
-            axis[2] = -n2;
-            otherShape.localSupportWithoutMargin(axis, supportB);
+          axis[0] = -n0;
+          axis[1] = -n1;
+          axis[2] = -n2;
+          otherShape.localSupportWithoutMargin(axis, supportB);
 
-            // Find distance from plane for each support.
-            var dot1 = (supportA[0] * n0) + (supportA[1] * n1) + (supportA[2] * n2) - nd;
-            var dot2 = (supportB[0] * n0) + (supportB[1] * n1) + (supportB[2] * n2) - nd;
+          // Find distance from plane for each support.
+          var dot1 = (supportA[0] * n0) + (supportA[1] * n1) + (supportA[2] * n2) - nd;
+          var dot2 = (supportB[0] * n0) + (supportB[1] * n1) + (supportB[2] * n2) - nd;
 
-            // Choose closest support to plane for distance computation
-            // with margins.
-            var seperation, c0, c1, c2;
-            if ((dot1 * dot1) < (dot2 * dot2))
-            {
-                c0 = supportA[0];
-                c1 = supportA[1];
-                c2 = supportA[2];
-                seperation = dot1;
-            }
-            else
-            {
-                c0 = supportB[0];
-                c1 = supportB[1];
-                c2 = supportB[2];
-                seperation = dot2;
-            }
+          // Choose closest support to plane for distance computation
+          // with margins.
+          var seperation, c0, c1, c2;
+          if ((dot1 * dot1) < (dot2 * dot2))
+          {
+              c0 = supportA[0];
+              c1 = supportA[1];
+              c2 = supportA[2];
+              seperation = dot1;
+          }
+          else
+          {
+              c0 = supportB[0];
+              c1 = supportB[1];
+              c2 = supportB[2];
+              seperation = dot2;
+          }
 
-            if ((seperation < 0) != ((dot1 * dot2) < 0))
-            {
-                seperation = -seperation;
-                // negate normal
-                w0 = -w0;
-                w1 = -w1;
-                w2 = -w2;
-            }
+          if ((seperation < 0.0) != ((dot1 * dot2) < 0.0))
+          {
+              seperation = -seperation;
+              // negate normal
+              w0 = -w0;
+              w1 = -w1;
+              w2 = -w2;
+          }
 
-            // Take collision margin from seperation.
-            var rad = otherShape._collisionRadius;
-            var prad = planeShape._collisionRadius;
+          // Take collision margin from seperation.
+          var rad = otherShape._collisionRadius;
+          var prad = planeShape._collisionRadius;
 
-            // find world-space support point on non-plane shape
-            //VMath.m43TransformPoint(otherXForm, closest, closest);
-            var a0 = (A0 * c0) + (A3 * c1) + (A6 * c2) + B9;
-            var a1 = (A1 * c0) + (A4 * c1) + (A7 * c2) + B10;
-            var a2 = (A2 * c0) + (A5 * c1) + (A8 * c2) + B11;
+          // find world-space support point on non-plane shape
+          //VMath.m43TransformPoint(otherXForm, closest, closest);
+          var a0 = (A0 * c0) + (A3 * c1) + (A6 * c2) + B9;
+          var a1 = (A1 * c0) + (A4 * c1) + (A7 * c2) + B10;
+          var a2 = (A2 * c0) + (A5 * c1) + (A8 * c2) + B11;
 
-            // find world-space support point on plane shape
-            // including collision margin
-            var rsep = prad - seperation;
-            var p0 = a0 + (w0 * rsep);
-            var p1 = a1 + (w1 * rsep);
-            var p2 = a2 + (w2 * rsep);
+          // find world-space support point on plane shape
+          // including collision margin
+          var rsep = prad - seperation;
+          var p0 = a0 + (w0 * rsep);
+          var p1 = a1 + (w1 * rsep);
+          var p2 = a2 + (w2 * rsep);
 
-            // apply collision margin to non-plane support.
-            a0 -= (w0 * rad);
-            a1 -= (w1 * rad);
-            a2 -= (w2 * rad);
+          // apply collision margin to non-plane support.
+          a0 -= (w0 * rad);
+          a1 -= (w1 * rad);
+          a2 -= (w2 * rad);
 
-            // apply collision radius to seperation.
-            seperation -= rad + prad;
-
-            if (shapeA is WebGLPhysicsPlaneShape/*.type == "PLANE"*/) {
-                axis[0] = -w0;
-                axis[1] = -w1;
-                axis[2] = -w2;
-                supportA[0] = p0;
-                supportA[1] = p1;
-                supportA[2] = p2;
-                supportB[0] = a0;
-                supportB[1] = a1;
-                supportB[2] = a2;
-            } else {
-                axis[0] = w0;
-                axis[1] = w1;
-                axis[2] = w2;
-                supportA[0] = a0;
-                supportA[1] = a1;
-                supportA[2] = a2;
-                supportB[0] = p0;
-                supportB[1] = p1;
-                supportB[2] = p2;
-            }
-
-            return seperation;
+          // apply collision radius to seperation.
+          seperation -= rad + prad;
+                         /*.type == "PLANE"*/
+          if (shapeA is WebGLPhysicsPlaneShape) {
+            axis[0] = -w0;
+            axis[1] = -w1;
+            axis[2] = -w2;
+            supportA[0] = p0;
+            supportA[1] = p1;
+            supportA[2] = p2;
+            supportB[0] = a0;
+            supportB[1] = a1;
+            supportB[2] = a2;
+          } else {
+            axis[0] = w0;
+            axis[1] = w1;
+            axis[2] = w2;
+            supportA[0] = a0;
+            supportA[1] = a1;
+            supportA[2] = a2;
+            supportB[0] = p0;
+            supportB[1] = p1;
+            supportB[2] = p2;
+          }
+          return seperation;
         } else {
             var gjk = this._contactGJK;
             var distance = gjk.evaluate(cache, xformA, xformB);
-            if (distance == null)
-            {
-                distance = this._contactEPA.evaluate(gjk.simplex, cache, xformA, xformB);
+            if ( distance == null ) {
+              distance = this._contactEPA.evaluate(gjk.simplex, cache, xformA, xformB);
             }
+            if( distance != null ){
+              var axis0 = axis[0];
+              var axis1 = axis[1];
+              var axis2 = axis[2];
 
-            if (distance != null)
-            {
-                var axis0 = axis[0];
-                var axis1 = axis[1];
-                var axis2 = axis[2];
+              var radiusA = shapeA._collisionRadius;
+              var radiusB = shapeB._collisionRadius;
 
-                var radiusA = shapeA._collisionRadius;
-                var radiusB = shapeB._collisionRadius;
+              supportA[0] -= axis0 * radiusA;
+              supportA[1] -= axis1 * radiusA;
+              supportA[2] -= axis2 * radiusA;
 
-                supportA[0] -= axis0 * radiusA;
-                supportA[1] -= axis1 * radiusA;
-                supportA[2] -= axis2 * radiusA;
+              supportB[0] += axis0 * radiusB;
+              supportB[1] += axis1 * radiusB;
+              supportB[2] += axis2 * radiusB;
 
-                supportB[0] += axis0 * radiusB;
-                supportB[1] += axis1 * radiusB;
-                supportB[2] += axis2 * radiusB;
-
-                return (distance - radiusA - radiusB);
+              return (distance - radiusA - radiusB);
             } else {
-                return null;
+              return null;
             }
         }
     }
@@ -2704,7 +2689,7 @@ class WebGLPhysicsWorld /*implements PhysicsWorld*/ {
                     extents.min.storage[2] = (fromExtents.min.storage[2] < toExtents.min.storage[2] ? fromExtents.min.storage[2] : toExtents.min.storage[2]);
                     extents.max.storage[0] = (fromExtents.max.storage[0] > toExtents.max.storage[0] ? fromExtents.max.storage[0] : toExtents.max.storage[0]);
                     extents.max.storage[1] = (fromExtents.max.storage[1] > toExtents.max.storage[1] ? fromExtents.max.storage[1] : toExtents.max.storage[1]);
-                    extents.max.storage[5] = (fromExtents.max.storage[5] > toExtents.max.storage[5] ? fromExtents.max.storage[5] : toExtents.max.storage[5]);
+                    extents.max.storage[2] = (fromExtents.max.storage[2] > toExtents.max.storage[2] ? fromExtents.max.storage[2] : toExtents.max.storage[2]);
 
                     numTriangles = triangleArray.spatialMap.getOverlappingNodes(extents, triangles, 0);
                     for (j = 0; j < numTriangles; j += 1) {

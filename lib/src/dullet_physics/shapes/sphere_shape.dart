@@ -19,7 +19,7 @@ class WebGLPhysicsSphereShape extends WebGLPhysicsShape
 
     WebGLPhysicsSphereShape({
       double margin: 0.04,
-      double radius
+      double radius: 0.5
     }) {
       //var margin = (param.margin != null) ? param.margin : 0.04;
       //var radius = param.radius;

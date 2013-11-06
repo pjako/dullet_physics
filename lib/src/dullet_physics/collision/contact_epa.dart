@@ -61,7 +61,6 @@ class WebGLContactEPA {
             minDistance = sqDistance;
           }
         }
-
         return minFace;
     }
 
@@ -165,7 +164,7 @@ class WebGLContactEPA {
             face.distance = this.getEdgeDistance(face, c, a);
           }
 
-          var scale = 1 / Math.sqrt(length);
+          var scale = 1.0 / Math.sqrt(length);
           if (face.distance == null) {
             // Origin must be closest to triangle plane.
             face.distance = ((a0 * fn0) + (a1 * fn1) + (a2 * fn2)) * scale;
@@ -244,262 +243,259 @@ class WebGLContactEPA {
     //   closestA <-- to be populated by this function
     //   closestB <-- to be populated by this function
     double evaluate(Float32List gjkSimplex, WebGLPhysicsTOIEvent cache, Matrix43 xformA, Matrix43 xformB) {
-        var shapeA = cache.shapeA;
-        var shapeB = cache.shapeB;
+      var shapeA = cache.shapeA;
+      var shapeB = cache.shapeB;
 
-        Hs hull = this.hull;
-        Hs stock = this.stock;
+      Hs hull = this.hull;
+      Hs stock = this.stock;
 
-        // Clean up after last evaluation
-        while (hull.root != null)
-        {
-            var face = hull.root;
-            this.remove(hull, face);
-            this.append(stock, face);
-        }
+      // Clean up after last evaluation
+      while (hull.root != null) {
+        var face = hull.root;
+        this.remove(hull, face);
+        this.append(stock, face);
+      }
 
-        // Orient simplex based on volume of tetrahedron
-        var d0 = gjkSimplex[27];
-        var d1 = gjkSimplex[28];
-        var d2 = gjkSimplex[29];
-        var ind0, ind1;
+      // Orient simplex based on volume of tetrahedron
+      var d0 = gjkSimplex[27];
+      var d1 = gjkSimplex[28];
+      var d2 = gjkSimplex[29];
+      var ind0, ind1;
 
-        var a0 = gjkSimplex[0] - d0;
-        var a1 = gjkSimplex[1] - d1;
-        var a2 = gjkSimplex[2] - d2;
-        var b0 = gjkSimplex[9] - d0;
-        var b1 = gjkSimplex[10] - d1;
-        var b2 = gjkSimplex[11] - d2;
-        var c0 = gjkSimplex[18] - d0;
-        var c1 = gjkSimplex[19] - d1;
-        var c2 = gjkSimplex[20] - d2;
+      var a0 = gjkSimplex[0] - d0;
+      var a1 = gjkSimplex[1] - d1;
+      var a2 = gjkSimplex[2] - d2;
+      var b0 = gjkSimplex[9] - d0;
+      var b1 = gjkSimplex[10] - d1;
+      var b2 = gjkSimplex[11] - d2;
+      var c0 = gjkSimplex[18] - d0;
+      var c1 = gjkSimplex[19] - d1;
+      var c2 = gjkSimplex[20] - d2;
 
-        if (((a0 * ((b1 * c2) - (b2 * c1))) +
-             (a1 * ((b2 * c0) - (b0 * c2))) +
-             (a2 * ((b0 * c1) - (b1 * c0)))) < 0.0) {
-            ind0 = 9;
-            ind1 = 0;
-        } else {
-            ind0 = 0;
-            ind1 = 9;
-        }
+      if (((a0 * ((b1 * c2) - (b2 * c1))) +
+           (a1 * ((b2 * c0) - (b0 * c2))) +
+           (a2 * ((b0 * c1) - (b1 * c0)))) < 0.0) {
+        ind0 = 9;
+        ind1 = 0;
+      } else {
+        ind0 = 0;
+        ind1 = 9;
+      }
 
-        var vertices = this.vertex_store;
-        var i;
-        for (i = 0; i < 9; i += 1) {
-            vertices[i] = gjkSimplex[ind0 + i];
-            vertices[9 + i] = gjkSimplex[ind1 + i];
-            vertices[18 + i] = gjkSimplex[18 + i];
-            vertices[27 + i] = gjkSimplex[27 + i];
-        }
+      var vertices = this.vertex_store;
+      var i;
+      for (i = 0; i < 9; i += 1) {
+        vertices[i] = gjkSimplex[ind0 + i];
+        vertices[9 + i] = gjkSimplex[ind1 + i];
+        vertices[18 + i] = gjkSimplex[18 + i];
+        vertices[27 + i] = gjkSimplex[27 + i];
+      }
 
-        // Build initial convex hull
-        var t0 = this.buildNewFace(0, 9, 18, true);
-        var t1 = this.buildNewFace(9, 0, 27, true);
-        var t2 = this.buildNewFace(18, 9, 27, true);
-        var t3 = this.buildNewFace(0, 18, 27, true);
+      // Build initial convex hull
+      var t0 = this.buildNewFace(0, 9, 18, true);
+      var t1 = this.buildNewFace(9, 0, 27, true);
+      var t2 = this.buildNewFace(18, 9, 27, true);
+      var t3 = this.buildNewFace(0, 18, 27, true);
 
-        var nextVertex = 36; //(4 * 9)
+      var nextVertex = 36; //(4 * 9)
 
-        if (hull.count != 4) {
-          cache.closestA.setValues(gjkSimplex[3], gjkSimplex[4], gjkSimplex[5]);
-          cache.closestA.setValues(gjkSimplex[6], gjkSimplex[7], gjkSimplex[8]);
-          return 0.0;
-        }
+      if (hull.count != 4) {
+        cache.closestA.setValues(gjkSimplex[3], gjkSimplex[4], gjkSimplex[5]);
+        cache.closestA.setValues(gjkSimplex[6], gjkSimplex[7], gjkSimplex[8]);
+        return 0.0;
+      }
 
-        var best = this.findBest();
-        var pass = 0;
-        var iterations = 0;
+      var best = this.findBest();
+      var pass = 0;
+      var iterations = 0;
 
-        this.bind(t0, 0, t1, 0);
-        this.bind(t0, 1, t2, 0);
-        this.bind(t0, 2, t3, 0);
-        this.bind(t1, 1, t3, 2);
-        this.bind(t1, 2, t2, 1);
-        this.bind(t2, 2, t3, 1);
+      this.bind(t0, 0, t1, 0);
+      this.bind(t0, 1, t2, 0);
+      this.bind(t0, 2, t3, 0);
+      this.bind(t1, 1, t3, 2);
+      this.bind(t1, 2, t2, 1);
+      this.bind(t2, 2, t3, 1);
 
-        // Cached for frequent access.
-        var A0 = xformA.storage[0];
-        var A1 = xformA.storage[1];
-        var A2 = xformA.storage[2];
-        var A3 = xformA.storage[3];
-        var A4 = xformA.storage[4];
-        var A5 = xformA.storage[5];
-        var A6 = xformA.storage[6];
-        var A7 = xformA.storage[7];
-        var A8 = xformA.storage[8];
-        var A9 = xformA.storage[9];
-        var A10 = xformA.storage[10];
-        var A11 = xformA.storage[11];
+      // Cached for frequent access.
+      var A0 = xformA.storage[0];
+      var A1 = xformA.storage[1];
+      var A2 = xformA.storage[2];
+      var A3 = xformA.storage[3];
+      var A4 = xformA.storage[4];
+      var A5 = xformA.storage[5];
+      var A6 = xformA.storage[6];
+      var A7 = xformA.storage[7];
+      var A8 = xformA.storage[8];
+      var A9 = xformA.storage[9];
+      var A10 = xformA.storage[10];
+      var A11 = xformA.storage[11];
 
-        var B0 = xformB.storage[0];
-        var B1 = xformB.storage[1];
-        var B2 = xformB.storage[2];
-        var B3 = xformB.storage[3];
-        var B4 = xformB.storage[4];
-        var B5 = xformB.storage[5];
-        var B6 = xformB.storage[6];
-        var B7 = xformB.storage[7];
-        var B8 = xformB.storage[8];
-        var B9 = xformB.storage[9];
-        var B10 = xformB.storage[10];
-        var B11 = xformB.storage[11];
+      var B0 = xformB.storage[0];
+      var B1 = xformB.storage[1];
+      var B2 = xformB.storage[2];
+      var B3 = xformB.storage[3];
+      var B4 = xformB.storage[4];
+      var B5 = xformB.storage[5];
+      var B6 = xformB.storage[6];
+      var B7 = xformB.storage[7];
+      var B8 = xformB.storage[8];
+      var B9 = xformB.storage[9];
+      var B10 = xformB.storage[10];
+      var B11 = xformB.storage[11];
 
-        var supportA = cache.closestA;
-        var supportB = cache.closestB;
+      var supportA = cache.closestA;
+      var supportB = cache.closestB;
 
-        var horizon = this.horizon;
-        Vector3 bn;
-        double n0, n1, n2;
+      var horizon = this.horizon;
+      Vector3 bn;
+      double n0, n1, n2;
 
-        for (; iterations < 100; iterations += 1)
-        {
-            if (nextVertex >= MAX_VERTICES * 9)
-            {
-                break;
+      for (; iterations < 100; iterations += 1)
+      {
+          if (nextVertex >= MAX_VERTICES * 9) {
+            break;
+          }
+
+          // reset horizon
+          horizon.cf = horizon.ff = null;
+          horizon.numFaces = 0;
+
+          // get vertex from pool
+          var w = nextVertex;
+          nextVertex += 9;
+
+          pass += 1;
+          best.pass = pass;
+
+          // populate vertex with supports.
+          bn = best.normal;
+          n0 = bn.storage[0];
+          n1 = bn.storage[1];
+          n2 = bn.storage[2];
+          //WebGLPrivatePhysicsWorld.prototype.m43InverseOrthonormalTransformVector(xformA, best.normal, supportA);
+          //WebGLPrivatePhysicsWorld.prototype.m43InverseOrthonormalTransformVector(xformB, best.normal, supportB);
+          //VMath.v3Neg(supportB, supportB);
+          supportA.storage[0] = ((A0 * n0) + (A1 * n1) + (A2 * n2));
+          supportA.storage[1] = ((A3 * n0) + (A4 * n1) + (A5 * n2));
+          supportA.storage[2] = ((A6 * n0) + (A7 * n1) + (A8 * n2));
+
+          supportB.storage[0] = -((B0 * n0) + (B1 * n1) + (B2 * n2));
+          supportB.storage[1] = -((B3 * n0) + (B4 * n1) + (B5 * n2));
+          supportB.storage[2] = -((B6 * n0) + (B7 * n1) + (B8 * n2));
+
+          shapeA.localSupportWithoutMargin(supportA, supportA);
+          shapeB.localSupportWithoutMargin(supportB, supportB);
+
+          //VMath.m43TransformPoint(xformA, supportA, supportA);
+          d0 = supportA[0];
+          d1 = supportA[1];
+          d2 = supportA[2];
+          a0 = ((A0 * d0) + (A3 * d1) + (A6 * d2) + A9);
+          a1 = ((A1 * d0) + (A4 * d1) + (A7 * d2) + A10);
+          a2 = ((A2 * d0) + (A5 * d1) + (A8 * d2) + A11);
+
+          //VMath.m43TransformPoint(xformB, supportB, supportB);
+          d0 = supportB[0];
+          d1 = supportB[1];
+          d2 = supportB[2];
+          b0 = ((B0 * d0) + (B3 * d1) + (B6 * d2) + B9);
+          b1 = ((B1 * d0) + (B4 * d1) + (B7 * d2) + B10);
+          b2 = ((B2 * d0) + (B5 * d1) + (B8 * d2) + B11);
+
+          var w0, w1, w2;
+          vertices[w + 3] = a0;
+          vertices[w + 4] = a1;
+          vertices[w + 5] = a2;
+          vertices[w + 6] = b0;
+          vertices[w + 7] = b1;
+          vertices[w + 8] = b2;
+          vertices[w]     = w0 = (a0 - b0);
+          vertices[w + 1] = w1 = (a1 - b1);
+          vertices[w + 2] = w2 = (a2 - b2);
+
+          // expand simplex
+          var wDist = ((n0 * w0) + (n1 * w1) + (n2 * w2)) - best.distance;
+          if (wDist > WebGLPhysicsConfig.GJK_EPA_DISTANCE_THRESHOLD) {
+            var j;
+            var valid = true;
+            for (j = 0; (j < 3 && valid); j += 1) {
+              valid = valid && this.expandFace(pass, w, best.adjFace[j], best.edge[j], horizon);
             }
 
-            // reset horizon
-            horizon.cf = horizon.ff = null;
-            horizon.numFaces = 0;
-
-            // get vertex from pool
-            var w = nextVertex;
-            nextVertex += 9;
-
-            pass += 1;
-            best.pass = pass;
-
-            // populate vertex with supports.
-            bn = best.normal;
-            n0 = bn.storage[0];
-            n1 = bn.storage[1];
-            n2 = bn.storage[2];
-            //WebGLPrivatePhysicsWorld.prototype.m43InverseOrthonormalTransformVector(xformA, best.normal, supportA);
-            //WebGLPrivatePhysicsWorld.prototype.m43InverseOrthonormalTransformVector(xformB, best.normal, supportB);
-            //VMath.v3Neg(supportB, supportB);
-            supportA.storage[0] = ((A0 * n0) + (A1 * n1) + (A2 * n2));
-            supportA.storage[1] = ((A3 * n0) + (A4 * n1) + (A5 * n2));
-            supportA.storage[2] = ((A6 * n0) + (A7 * n1) + (A8 * n2));
-
-            supportB.storage[0] = -((B0 * n0) + (B1 * n1) + (B2 * n2));
-            supportB.storage[1] = -((B3 * n0) + (B4 * n1) + (B5 * n2));
-            supportB.storage[2] = -((B6 * n0) + (B7 * n1) + (B8 * n2));
-
-            shapeA.localSupportWithoutMargin(supportA, supportA);
-            shapeB.localSupportWithoutMargin(supportB, supportB);
-
-            //VMath.m43TransformPoint(xformA, supportA, supportA);
-            d0 = supportA[0];
-            d1 = supportA[1];
-            d2 = supportA[2];
-            a0 = ((A0 * d0) + (A3 * d1) + (A6 * d2) + A9);
-            a1 = ((A1 * d0) + (A4 * d1) + (A7 * d2) + A10);
-            a2 = ((A2 * d0) + (A5 * d1) + (A8 * d2) + A11);
-
-            //VMath.m43TransformPoint(xformB, supportB, supportB);
-            d0 = supportB[0];
-            d1 = supportB[1];
-            d2 = supportB[2];
-            b0 = ((B0 * d0) + (B3 * d1) + (B6 * d2) + B9);
-            b1 = ((B1 * d0) + (B4 * d1) + (B7 * d2) + B10);
-            b2 = ((B2 * d0) + (B5 * d1) + (B8 * d2) + B11);
-
-            var w0, w1, w2;
-            vertices[w + 3] = a0;
-            vertices[w + 4] = a1;
-            vertices[w + 5] = a2;
-            vertices[w + 6] = b0;
-            vertices[w + 7] = b1;
-            vertices[w + 8] = b2;
-            vertices[w]     = w0 = (a0 - b0);
-            vertices[w + 1] = w1 = (a1 - b1);
-            vertices[w + 2] = w2 = (a2 - b2);
-
-            // expand simplex
-            var wDist = ((n0 * w0) + (n1 * w1) + (n2 * w2)) - best.distance;
-            if (wDist > WebGLPhysicsConfig.GJK_EPA_DISTANCE_THRESHOLD) {
-                var j;
-                var valid = true;
-                for (j = 0; (j < 3 && valid); j += 1) {
-                    valid = valid && this.expandFace(pass, w, best.adjFace[j], best.edge[j], horizon);
-                }
-
-                if (valid && (horizon.numFaces >= 3)) {
-                    this.bind(horizon.cf, 1, horizon.ff, 2);
-                    this.remove(hull, best);
-                    this.append(stock, best);
-                    best = this.findBest();
-                } else {
-                    break;
-                }
+            if (valid && (horizon.numFaces >= 3)) {
+              this.bind(horizon.cf, 1, horizon.ff, 2);
+              this.remove(hull, best);
+              this.append(stock, best);
+              best = this.findBest();
             } else {
-                break;
+              break;
             }
-        }
+          } else {
+            break;
+          }
+      }
 
-        bn = best.normal;
-        n0 = bn.storage[0];
-        n1 = bn.storage[1];
-        n2 = bn.storage[2];
-        var bd = best.distance;
+      bn = best.normal;
+      n0 = bn.storage[0];
+      n1 = bn.storage[1];
+      n2 = bn.storage[2];
+      var bd = best.distance;
 
-        // Projection of origin onto final face of simplex.
-        var p0 = n0 * bd;
-        var p1 = n1 * bd;
-        var p2 = n2 * bd;
+      // Projection of origin onto final face of simplex.
+      var p0 = n0 * bd;
+      var p1 = n1 * bd;
+      var p2 = n2 * bd;
 
-        c0 = best.vertex[0];
-        c1 = best.vertex[1];
-        c2 = best.vertex[2];
+      c0 = best.vertex[0];
+      c1 = best.vertex[1];
+      c2 = best.vertex[2];
 
-        var x0 = vertices[c0]     - p0;
-        var x1 = vertices[c0 + 1] - p1;
-        var x2 = vertices[c0 + 2] - p2;
+      var x0 = vertices[c0]     - p0;
+      var x1 = vertices[c0 + 1] - p1;
+      var x2 = vertices[c0 + 2] - p2;
 
-        var y0 = vertices[c1]     - p0;
-        var y1 = vertices[c1 + 1] - p1;
-        var y2 = vertices[c1 + 2] - p2;
+      var y0 = vertices[c1]     - p0;
+      var y1 = vertices[c1 + 1] - p1;
+      var y2 = vertices[c1 + 2] - p2;
 
-        var z0 = vertices[c2]     - p0;
-        var z1 = vertices[c2 + 1] - p1;
-        var z2 = vertices[c2 + 2] - p2;
+      var z0 = vertices[c2]     - p0;
+      var z1 = vertices[c2 + 1] - p1;
+      var z2 = vertices[c2 + 2] - p2;
 
-        // Compute barycentric coordinates of origin's projection on face.
-        d0 = ((y1 * z2) - (y2 * z1));
-        d1 = ((y2 * z0) - (y0 * z2));
-        d2 = ((y0 * z1) - (y1 * z0));
-        var alpha = Math.sqrt((d0 * d0) + (d1 * d1) + (d2 * d2));
+      // Compute barycentric coordinates of origin's projection on face.
+      d0 = ((y1 * z2) - (y2 * z1));
+      d1 = ((y2 * z0) - (y0 * z2));
+      d2 = ((y0 * z1) - (y1 * z0));
+      var alpha = Math.sqrt((d0 * d0) + (d1 * d1) + (d2 * d2));
 
-        d0 = ((z1 * x2) - (z2 * x1));
-        d1 = ((z2 * x0) - (z0 * x2));
-        d2 = ((z0 * x1) - (z1 * x0));
-        var beta = Math.sqrt((d0 * d0) + (d1 * d1) + (d2 * d2));
+      d0 = ((z1 * x2) - (z2 * x1));
+      d1 = ((z2 * x0) - (z0 * x2));
+      d2 = ((z0 * x1) - (z1 * x0));
+      var beta = Math.sqrt((d0 * d0) + (d1 * d1) + (d2 * d2));
 
-        d0 = ((x1 * y2) - (x2 * y1));
-        d1 = ((x2 * y0) - (x0 * y2));
-        d2 = ((x0 * y1) - (x1 * y0));
-        var gamma = Math.sqrt((d0 * d0) + (d1 * d1) + (d2 * d2));
+      d0 = ((x1 * y2) - (x2 * y1));
+      d1 = ((x2 * y0) - (x0 * y2));
+      d2 = ((x0 * y1) - (x1 * y0));
+      var gamma = Math.sqrt((d0 * d0) + (d1 * d1) + (d2 * d2));
 
-        var scale = 1 / (alpha + beta + gamma);
-        alpha *= scale;
-        beta *= scale;
-        gamma *= scale;
+      var scale = 1 / (alpha + beta + gamma);
+      alpha *= scale;
+      beta *= scale;
+      gamma *= scale;
 
-        // Interpolate for ideal support points.
-        supportA.storage[0] = supportA.storage[1] = supportA.storage[2] = 0.0;
-        supportB.storage[0] = supportB.storage[1] = supportB.storage[2] = 0.0;
-        for (i = 0; i < 3; i += 1)
-        {
-            supportA[i] += (alpha * vertices[c0 + 3 + i]) + (beta * vertices[c1 + 3 + i]) + (gamma * vertices[c2 + 3 + i]);
-            supportB[i] += (alpha * vertices[c0 + 6 + i]) + (beta * vertices[c1 + 6 + i]) + (gamma * vertices[c2 + 6 + i]);
-        }
+      // Interpolate for ideal support points.
+      supportA.storage[0] = supportA.storage[1] = supportA.storage[2] = 0.0;
+      supportB.storage[0] = supportB.storage[1] = supportB.storage[2] = 0.0;
+      for (i = 0; i < 3; i += 1) {
+        supportA[i] += (alpha * vertices[c0 + 3 + i]) + (beta * vertices[c1 + 3 + i]) + (gamma * vertices[c2 + 3 + i]);
+        supportB[i] += (alpha * vertices[c0 + 6 + i]) + (beta * vertices[c1 + 6 + i]) + (gamma * vertices[c2 + 6 + i]);
+      }
 
-        var axis = cache.axis;
-        axis[0] = -n0;
-        axis[1] = -n1;
-        axis[2] = -n2;
-        return (-best.distance);
+      var axis = cache.axis;
+      axis[0] = -n0;
+      axis[1] = -n1;
+      axis[2] = -n2;
+      return (-best.distance);
     }
 
     WebGLContactEPA() {

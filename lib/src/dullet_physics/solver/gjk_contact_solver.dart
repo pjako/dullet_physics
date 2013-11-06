@@ -502,243 +502,239 @@ class WebGLGJKContactSolver
     //   closestA <-- to be populated by this function
     //   closestB <-- to be populated by this function
     double evaluate(WebGLPhysicsTOIEvent cache, Matrix43 xformA, Matrix43 xformB) {
-        var axis = cache.axis;
-        var shapeA = cache.shapeA;
-        var shapeB = cache.shapeB;
+      var axis = cache.axis;
+      var shapeA = cache.shapeA;
+      var shapeB = cache.shapeB;
 
-        // Reset GJK.
-        this.numVertices = 0;
-        double lastW0, lastW1, lastW2;
-        lastW0 = lastW1 = lastW2 = double.MAX_FINITE;//Number.MAX_VALUE;
+      // Reset GJK.
+      this.numVertices = 0;
+      double lastW0, lastW1, lastW2;
+      lastW0 = lastW1 = lastW2 = double.MAX_FINITE;//Number.MAX_VALUE;
 
-        var curIter = 0;
-        var maxIter = 100;
-        var seperated = false;
+      var curIter = 0;
+      var maxIter = 100;
+      var seperated = false;
 
-        var squaredDistance = double.MAX_FINITE;//Number.MAX_VALUE;
+      var squaredDistance = double.MAX_FINITE;//Number.MAX_VALUE;
 
-        // Cached for frequent access.
-        var A0 = xformA.storage[0];
-        var A1 = xformA.storage[1];
-        var A2 = xformA.storage[2];
-        var A3 = xformA.storage[3];
-        var A4 = xformA.storage[4];
-        var A5 = xformA.storage[5];
-        var A6 = xformA.storage[6];
-        var A7 = xformA.storage[7];
-        var A8 = xformA.storage[8];
-        var A9 = xformA.storage[9];
-        var A10 = xformA.storage[10];
-        var A11 = xformA.storage[11];
+      // Cached for frequent access.
+      var A0 = xformA.storage[0];
+      var A1 = xformA.storage[1];
+      var A2 = xformA.storage[2];
+      var A3 = xformA.storage[3];
+      var A4 = xformA.storage[4];
+      var A5 = xformA.storage[5];
+      var A6 = xformA.storage[6];
+      var A7 = xformA.storage[7];
+      var A8 = xformA.storage[8];
+      var A9 = xformA.storage[9];
+      var A10 = xformA.storage[10];
+      var A11 = xformA.storage[11];
 
-        var B0 = xformB.storage[0];
-        var B1 = xformB.storage[1];
-        var B2 = xformB.storage[2];
-        var B3 = xformB.storage[3];
-        var B4 = xformB.storage[4];
-        var B5 = xformB.storage[5];
-        var B6 = xformB.storage[6];
-        var B7 = xformB.storage[7];
-        var B8 = xformB.storage[8];
-        var B9 = xformB.storage[9];
-        var B10 = xformB.storage[10];
-        var B11 = xformB.storage[11];
+      var B0 = xformB.storage[0];
+      var B1 = xformB.storage[1];
+      var B2 = xformB.storage[2];
+      var B3 = xformB.storage[3];
+      var B4 = xformB.storage[4];
+      var B5 = xformB.storage[5];
+      var B6 = xformB.storage[6];
+      var B7 = xformB.storage[7];
+      var B8 = xformB.storage[8];
+      var B9 = xformB.storage[9];
+      var B10 = xformB.storage[10];
+      var B11 = xformB.storage[11];
 
-        var axis0 = axis.storage[0];
-        var axis1 = axis.storage[1];
-        var axis2 = axis.storage[2];
-        var axislsq;
+      var axis0 = axis.storage[0];
+      var axis1 = axis.storage[1];
+      var axis2 = axis.storage[2];
+      var axislsq;
 
-        var supportA = cache.closestA;
-        var supportB = cache.closestB;
+      var supportA = cache.closestA;
+      var supportB = cache.closestB;
 
-        var closest = this.closest;
-        var simplex = this.simplex;
+      var closest = this.closest;
+      var simplex = this.simplex;
 
-        // Epsilon defined based on rough experimental result.
-        var equalVertexThreshold = 1e-4;
+      // Epsilon defined based on rough experimental result.
+      final double equalVertexThreshold = 1e-4;
 
-        for (;;)
-        {
-            curIter += 1;
+      for (;;) {
+        curIter += 1;
 
-            // supportA = xformA * shapeA.localSupport ( - ixformA * axis)
-            // supportB = xformB * shapeB.localSupport (   ixformB * axis)
-            //this.m43InverseOrthonormalTransformVector(xformA, axis, supportA);
-            //VMath.v3Neg(supportA, supportA);
-            supportA[0] = -((A0 * axis0) + (A1 * axis1) + (A2 * axis2));
-            supportA[1] = -((A3 * axis0) + (A4 * axis1) + (A5 * axis2));
-            supportA[2] = -((A6 * axis0) + (A7 * axis1) + (A8 * axis2));
+        // supportA = xformA * shapeA.localSupport ( - ixformA * axis)
+        // supportB = xformB * shapeB.localSupport (   ixformB * axis)
+        //this.m43InverseOrthonormalTransformVector(xformA, axis, supportA);
+        //VMath.v3Neg(supportA, supportA);
+        supportA[0] = -((A0 * axis0) + (A1 * axis1) + (A2 * axis2));
+        supportA[1] = -((A3 * axis0) + (A4 * axis1) + (A5 * axis2));
+        supportA[2] = -((A6 * axis0) + (A7 * axis1) + (A8 * axis2));
 
-            //this.m43InverseOrthonormalTransformVector(xformB, axis, supportB);
-            supportB[0] = ((B0 * axis0) + (B1 * axis1) + (B2 * axis2));
-            supportB[1] = ((B3 * axis0) + (B4 * axis1) + (B5 * axis2));
-            supportB[2] = ((B6 * axis0) + (B7 * axis1) + (B8 * axis2));
+        //this.m43InverseOrthonormalTransformVector(xformB, axis, supportB);
+        supportB[0] = ((B0 * axis0) + (B1 * axis1) + (B2 * axis2));
+        supportB[1] = ((B3 * axis0) + (B4 * axis1) + (B5 * axis2));
+        supportB[2] = ((B6 * axis0) + (B7 * axis1) + (B8 * axis2));
 
-            shapeA.localSupportWithoutMargin(supportA, supportA);
-            shapeB.localSupportWithoutMargin(supportB, supportB);
+        shapeA.localSupportWithoutMargin(supportA, supportA);
+        shapeB.localSupportWithoutMargin(supportB, supportB);
 
-            //VMath.m43TransformPoint(xformA, supportA, supportA);
-            var d0 = supportA[0];
-            var d1 = supportA[1];
-            var d2 = supportA[2];
-            var sa0 = supportA[0] = ((A0 * d0) + (A3 * d1) + (A6 * d2) + A9);
-            var sa1 = supportA[1] = ((A1 * d0) + (A4 * d1) + (A7 * d2) + A10);
-            var sa2 = supportA[2] = ((A2 * d0) + (A5 * d1) + (A8 * d2) + A11);
+        //VMath.m43TransformPoint(xformA, supportA, supportA);
+        var d0 = supportA[0];
+        var d1 = supportA[1];
+        var d2 = supportA[2];
+        var sa0 = supportA[0] = ((A0 * d0) + (A3 * d1) + (A6 * d2) + A9);
+        var sa1 = supportA[1] = ((A1 * d0) + (A4 * d1) + (A7 * d2) + A10);
+        var sa2 = supportA[2] = ((A2 * d0) + (A5 * d1) + (A8 * d2) + A11);
 
-            //VMath.m43TransformPoint(xformB, supportB, supportB);
-            d0 = supportB[0];
-            d1 = supportB[1];
-            d2 = supportB[2];
-            var sb0 = supportB[0] = ((B0 * d0) + (B3 * d1) + (B6 * d2) + B9);
-            var sb1 = supportB[1] = ((B1 * d0) + (B4 * d1) + (B7 * d2) + B10);
-            var sb2 = supportB[2] = ((B2 * d0) + (B5 * d1) + (B8 * d2) + B11);
+        //VMath.m43TransformPoint(xformB, supportB, supportB);
+        d0 = supportB[0];
+        d1 = supportB[1];
+        d2 = supportB[2];
+        var sb0 = supportB[0] = ((B0 * d0) + (B3 * d1) + (B6 * d2) + B9);
+        var sb1 = supportB[1] = ((B1 * d0) + (B4 * d1) + (B7 * d2) + B10);
+        var sb2 = supportB[2] = ((B2 * d0) + (B5 * d1) + (B8 * d2) + B11);
 
-            //VMath.v3Sub(supportA, supportB, w);
-            var w0 = sa0 - sb0;
-            var w1 = sa1 - sb1;
-            var w2 = sa2 - sb2;
+        //VMath.v3Sub(supportA, supportB, w);
+        var w0 = sa0 - sb0;
+        var w1 = sa1 - sb1;
+        var w2 = sa2 - sb2;
 
-            // If point is already in simplex, then we have reached closest point to origin
-            // and minkowski difference does not intersect origin.
-            bool inSimplex = false;
-            var index = this.numVertices * 9;
-            var i;
-            for (i = 0; i < index; i += 9) {
-                d0 = (w0 - simplex[i]);
-                d1 = (w1 - simplex[i + 1]);
-                d2 = (w2 - simplex[i + 2]);
-                if (((d0 * d0) + (d1 * d1) + (d2 * d2)) < equalVertexThreshold) {
-                    inSimplex = true;
-                }
-            }
-
-            // Additionaly check against previously inserted vertex which may have been
-            // removed and prevent endless oscillation.
-            if (!inSimplex) {
-                d0 = (w0 - lastW0);
-                d1 = (w1 - lastW1);
-                d2 = (w2 - lastW2);
-                inSimplex = ((d0 * d0) + (d1 * d1) + (d2 * d2)) < equalVertexThreshold;
-            }
-
-            if (inSimplex) {
-                seperated = true;
-                break;
-            }
-
-            //delta = VMath.v3Dot(axis, w);
-            var delta = (axis0 * w0) + (axis1 * w1) + (axis2 * w2);
-
-            // Check that we are getting closer
-            // If not (within epsilon) we are very roughly at closest point
-            // and should terminate!
-            //
-            if ((squaredDistance - delta) <= (squaredDistance * WebGLPhysicsConfig.GJK_FRACTIONAL_THRESHOLD)) {
-                seperated = true;
-                break;
-            }
-
-            // Add vertex to simplex.
-            lastW0 = simplex[index] = w0;
-            lastW1 = simplex[index + 1] = w1;
-            lastW2 = simplex[index + 2] = w2;
-            simplex[index + 3] = sa0;
-            simplex[index + 4] = sa1;
-            simplex[index + 5] = sa2;
-            simplex[index + 6] = sb0;
-            simplex[index + 7] = sb1;
-            simplex[index + 8] = sb2;
-            this.numVertices += 1;
-
-            // If we cannot find a seperating axis
-            // Then shapes are intersecting!
-            if (!this.updateClosestPoints()) {
-                seperated = false;
-                break;
-            }
-
-            d0 = (closest[0] - closest[3]);
-            d1 = (closest[1] - closest[4]);
-            d2 = (closest[2] - closest[5]);
-
-            // If seperation distance is very (very) small
-            // Then we assume shapes are intersecting.
-            axislsq = ((d0 * d0) + (d1 * d1) + (d2 * d2));
-            if (axislsq <= WebGLPhysicsConfig.GJK_EPA_DISTANCE_THRESHOLD)
-            {
-                seperated = true;
-                break;
-            }
-
-            // Prepare for next iteration.
-            //VMath.v3Copy(newaxis, axis);
-            axis0 = d0;
-            axis1 = d1;
-            axis2 = d2;
-
-            // Check that we are getting closer with true distances
-            // If not, terminate!
-            var previousSqDistance = squaredDistance;
-            squaredDistance = axislsq;
-
-            if ((previousSqDistance - squaredDistance) <= (WebGLPhysicsConfig.GJK_FRACTIONAL_THRESHOLD * previousSqDistance))
-            {
-                seperated = true;
-                break;
-            }
-
-            if (curIter >= maxIter)
-            {
-                seperated = true;
-                break;
-            }
-
-            // We already have a full simplex
-            // Next iteration would add too many vertices
-            // So we must be intersecting
-            if (this.numVertices == 4)
-            {
-                break;
-            }
+        // If point is already in simplex, then we have reached closest point to origin
+        // and minkowski difference does not intersect origin.
+        bool inSimplex = false;
+        var index = this.numVertices * 9;
+        var i;
+        for (i = 0; i < index; i += 9) {
+          d0 = (w0 - simplex[i]);
+          d1 = (w1 - simplex[i + 1]);
+          d2 = (w2 - simplex[i + 2]);
+          if (((d0 * d0) + (d1 * d1) + (d2 * d2)) < equalVertexThreshold) {
+              inSimplex = true;
+          }
         }
 
-        // If we cannot normalise axis, then necessarigly
-        // seperated = false.
-        // We do not zero the axis, as it is still useful enough for EPA.
-        axislsq = ((axis0 * axis0) + (axis1 * axis1) + (axis2 * axis2));
-        if (axislsq < WebGLPhysicsConfig.DONT_NORMALIZE_THRESHOLD)
-        {
-            axis[0] = axis0;
-            axis[1] = axis1;
-            axis[2] = axis2;
-            return null;
+        // Additionaly check against previously inserted vertex which may have been
+        // removed and prevent endless oscillation.
+        if (!inSimplex) {
+          d0 = (w0 - lastW0);
+          d1 = (w1 - lastW1);
+          d2 = (w2 - lastW2);
+          inSimplex = ((d0 * d0) + (d1 * d1) + (d2 * d2)) < equalVertexThreshold;
         }
 
-        // Normalise axis whether GJK failed or succeeded:
-        // Is useful information for futher investigations.
-        var scale = 1 / Math.sqrt(axislsq);
-        axis[0] = axis0 * scale;
-        axis[1] = axis1 * scale;
-        axis[2] = axis2 * scale;
-
-        if (seperated)
-        {
-            // Get closest points in simplex.
-            supportA[0] = closest[0];
-            supportA[1] = closest[1];
-            supportA[2] = closest[2];
-
-            supportB[0] = closest[3];
-            supportB[1] = closest[4];
-            supportB[2] = closest[5];
-
-            return Math.sqrt(squaredDistance);
+        if (inSimplex) {
+          seperated = true;
+          break;
         }
-        else
-        {
-            return null;
+
+        //delta = VMath.v3Dot(axis, w);
+        var delta = (axis0 * w0) + (axis1 * w1) + (axis2 * w2);
+
+        // Check that we are getting closer
+        // If not (within epsilon) we are very roughly at closest point
+        // and should terminate!
+        //
+        if ((squaredDistance - delta) <= (squaredDistance * WebGLPhysicsConfig.GJK_FRACTIONAL_THRESHOLD)) {
+          seperated = true;
+          break;
         }
+
+        // Add vertex to simplex.
+        lastW0 = simplex[index] = w0;
+        lastW1 = simplex[index + 1] = w1;
+        lastW2 = simplex[index + 2] = w2;
+        simplex[index + 3] = sa0;
+        simplex[index + 4] = sa1;
+        simplex[index + 5] = sa2;
+        simplex[index + 6] = sb0;
+        simplex[index + 7] = sb1;
+        simplex[index + 8] = sb2;
+        this.numVertices += 1;
+
+        // If we cannot find a seperating axis
+        // Then shapes are intersecting!
+        if (!this.updateClosestPoints()) {
+          seperated = false;
+          break;
+        }
+
+        d0 = (closest[0] - closest[3]);
+        d1 = (closest[1] - closest[4]);
+        d2 = (closest[2] - closest[5]);
+
+        // If seperation distance is very (very) small
+        // Then we assume shapes are intersecting.
+        axislsq = ((d0 * d0) + (d1 * d1) + (d2 * d2));
+        if (axislsq <= WebGLPhysicsConfig.GJK_EPA_DISTANCE_THRESHOLD) {
+          seperated = true;
+          break;
+        }
+
+        // Prepare for next iteration.
+        //VMath.v3Copy(newaxis, axis);
+        axis0 = d0;
+        axis1 = d1;
+        axis2 = d2;
+
+        // Check that we are getting closer with true distances
+        // If not, terminate!
+        var previousSqDistance = squaredDistance;
+        squaredDistance = axislsq;
+
+        if ((previousSqDistance - squaredDistance) <=
+            (WebGLPhysicsConfig.GJK_FRACTIONAL_THRESHOLD * previousSqDistance)) {
+          seperated = true;
+          break;
+        }
+
+        if (curIter >= maxIter) {
+          seperated = true;
+          break;
+        }
+
+        // We already have a full simplex
+        // Next iteration would add too many vertices
+        // So we must be intersecting
+        if (this.numVertices == 4) {
+          break;
+        }
+      }
+
+      // If we cannot normalise axis, then necessarigly
+      // seperated = false.
+      // We do not zero the axis, as it is still useful enough for EPA.
+      axislsq = ((axis0 * axis0) + (axis1 * axis1) + (axis2 * axis2));
+      if (axislsq < WebGLPhysicsConfig.DONT_NORMALIZE_THRESHOLD)
+      {
+          axis[0] = axis0;
+          axis[1] = axis1;
+          axis[2] = axis2;
+          return null;
+      }
+
+      // Normalise axis whether GJK failed or succeeded:
+      // Is useful information for futher investigations.
+      var scale = 1 / Math.sqrt(axislsq);
+      axis[0] = axis0 * scale;
+      axis[1] = axis1 * scale;
+      axis[2] = axis2 * scale;
+
+      if (seperated)
+      {
+          // Get closest points in simplex.
+          supportA[0] = closest[0];
+          supportA[1] = closest[1];
+          supportA[2] = closest[2];
+
+          supportB[0] = closest[3];
+          supportB[1] = closest[4];
+          supportB[2] = closest[5];
+
+          return Math.sqrt(squaredDistance);
+      }
+      else
+      {
+          return null;
+      }
     }
 
     WebGLGJKContactSolver() {

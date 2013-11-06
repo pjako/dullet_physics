@@ -12,11 +12,29 @@ abstract class WebGLPhysicsShape {
   // Ours
   Vector3 _center;
   RayHit rayTest(var ray);
-  var _private;
+  //var _private;
 
   void localSupportWithoutMargin(Vector3 vec, Vector3 dst) {
 
   }
+
+  double get margin => _collisionRadius;
+
+  void set margin(double margin_) {
+    _halfExtents[0] += (margin_ - _collisionRadius);
+    _halfExtents[1] += (margin_ - _collisionRadius);
+    _halfExtents[2] += (margin_ - _collisionRadius);
+    _radius += (margin_ - _collisionRadius);
+    _collisionRadius = margin;
+  }
+
+  Vector3 getInertia(Vector3 out) {
+    _inertia.copyInto(out);
+  }
+  Vector3 get intertia => _inertia.clone();
+
+  double get radius => _radius;
+
 
 /*
   double get margin => _private.collisionRadius;

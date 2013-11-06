@@ -10,7 +10,8 @@ class WebGLPhysicsCollisionObject extends WebGLPhysicsPrivateBody// PhysicsColli
 
     // From PhysicsCollisionObject
     //var transform; // m43
-    /*WebGL*/WebGLPhysicsShape get shape => _shape;
+    /*WebGL*/
+    WebGLPhysicsShape get shape => _shape;
     //WebGLPhysicsShape _shape;
     //int group;  // getter for group
     //int mask;   // getter for mask
@@ -25,7 +26,7 @@ class WebGLPhysicsCollisionObject extends WebGLPhysicsPrivateBody// PhysicsColli
 
     //WebGLPhysicsWorld world;
 
-    WebGLPhysicsContactCallbacks contactCallbacks;
+    //WebGLPhysicsContactCallbacks contactCallbacks;
 
     //bool sweepFrozen;
 
@@ -36,7 +37,7 @@ class WebGLPhysicsCollisionObject extends WebGLPhysicsPrivateBody// PhysicsColli
     static final Vector3 sharedInverseInertiaLocal = new Vector3.zero();
     static final Matrix3 sharedInverseInertia = new Matrix3.identity();
 
-    calculateExtents(Aabb3 extents){
+    void calculateExtents(Aabb3 extents){
         this._calculateExtents(extents);
     }
 
@@ -53,9 +54,9 @@ class WebGLPhysicsCollisionObject extends WebGLPhysicsPrivateBody// PhysicsColli
             userData: userData);
     }
     int get group => _group;
-    int _group;
+    //int _group;
     int get mask => _mask;
-    int _mask;
+    //int _mask;
     Matrix43 get transform => _transform.clone();
     void set transform(Matrix43 transform) {
       var pr = this;
@@ -93,7 +94,7 @@ class WebGLPhysicsCollisionObject extends WebGLPhysicsPrivateBody// PhysicsColli
         arbiters[i].invalidateParameters();
       }
     }
-    bool _kinematic;
+    //bool _kinematic;
     bool get kinematic => _kinematic;
     WebGLPhysicsCollisionObject({
       WebGLPhysicsShape shape,
@@ -112,23 +113,24 @@ class WebGLPhysicsCollisionObject extends WebGLPhysicsPrivateBody// PhysicsColli
       int mask: WebGLPhysicsDevice.FILTER_ALL ^ WebGLPhysicsDevice.FILTER_STATIC,
       bool kinematic: false,
       dynamic userData}) : super(
-          shape: shape,
-          transform: transform,
-          linearVelocity: linearVelocity,
-          angularVelocity: angularVelocity,
-          friction: friction) {
-        var rets = this;
+          shape,
+          transform,
+          linearVelocity,
+          angularVelocity,
+          friction,
+          restitution,
+          linearDamping,
+          angularDamping) {
 
-        // Needs data!
 
         //var s = new WebGLPhysicsPrivateBody(params, rets);
         //rets._private = s;
 
         //read/write, no side effects
-        rets.userData = userData;
+        userData = userData;
 
         // read only, no getter needed
-        rets._shape = shape;
+        //_shape = shape;
 
         _group = group;
         _mask = mask;
@@ -141,7 +143,6 @@ class WebGLPhysicsCollisionObject extends WebGLPhysicsPrivateBody// PhysicsColli
         _group = group;
         _mask = mask;
 
-        _kinematic = kinematic;
         _fixedRotation = !kinematic;
 
         _mass = 0.0;
@@ -163,18 +164,13 @@ class WebGLPhysicsCollisionObject extends WebGLPhysicsPrivateBody// PhysicsColli
         _active = kinematic;
 
         // prepare for contact callbacks
-        if (onPreSolveContact != null || onAddedContacts != null || onProcessedContacts != null || onRemovedContacts != null)
-        {
+        if (onPreSolveContact != null || onAddedContacts != null || onProcessedContacts != null || onRemovedContacts != null) {
             _contactCallbacks = new WebGLPhysicsContactCallbacks(
                 onAddedContacts: onAddedContacts,
                 onProcessedContacts: onProcessedContacts,
                 onRemovedContacts: onRemovedContacts,
                 mask: mask);
-        } else {
-            _contactCallbacks = null;
         }
-
-        //return rets;
     }
 /*
     static create(params: any): WebGLPhysicsCollisionObject
