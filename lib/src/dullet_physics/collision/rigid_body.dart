@@ -227,7 +227,6 @@ class WebGLPhysicsRigidBody extends WebGLPhysicsPrivateBody /*implements Physics
           restitution,
           linearDamping,
           angularDamping) {
-        var retr = this;
         //retr._private = r;
         if(inertia != null) {
           _inertia = inertia.clone();
@@ -266,20 +265,16 @@ class WebGLPhysicsRigidBody extends WebGLPhysicsPrivateBody /*implements Physics
             onAddedContacts != null ||
             onProcessedContacts != null ||
             onRemovedContacts != null) {
-            _contactCallbacks = new WebGLPhysicsContactCallbacks(
-                mask: mask,
-                trigger: false,
-                onAddedContacts: onAddedContacts,
-                onPreSolveContact: onPreSolveContact,
-                onProcessedContacts: onProcessedContacts,
-                onRemovedContacts: onRemovedContacts
-
-                );
+        _contactCallbacks = new WebGLPhysicsContactCallbacks(
+          mask: mask,
+          trigger: false,
+          onAddedContacts: onAddedContacts,
+          onPreSolveContact: onPreSolveContact,
+          onProcessedContacts: onProcessedContacts,
+          onRemovedContacts: onRemovedContacts);
         } else {
-            _contactCallbacks = null;
+          _contactCallbacks = null;
         }
-
-        //return retr;
     }
 }
 

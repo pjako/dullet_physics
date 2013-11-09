@@ -365,7 +365,6 @@ class WebGLPhysicsPrivateBody implements ExternalAabbTreeNode {
     // used for kinematics and dynamics
     void _integratePositionWithVelocities(Matrix43 transform, Matrix43 outTransform, double timeStep, int offset){
       var velocity = this._velocity;
-      var sqrt = Math.sqrt;
 
       // x += h * v
       outTransform.storage[9]  = transform.storage[9]  + (timeStep * velocity.storage[offset]);
@@ -398,7 +397,7 @@ class WebGLPhysicsPrivateBody implements ExternalAabbTreeNode {
       var B8 = A8 - (w1 * A6) + (w0 * A7);
 
       // Orthornormalize with modified gram schmidt.
-      var scale = 1.0 / sqrt((B0 * B0) + (B1 * B1) + (B2 * B2));
+      var scale = 1.0 / Math.sqrt((B0 * B0) + (B1 * B1) + (B2 * B2));
       B0 *= scale;
       B1 *= scale;
       B2 *= scale;
@@ -408,7 +407,7 @@ class WebGLPhysicsPrivateBody implements ExternalAabbTreeNode {
       B4 += B1 * scale;
       B5 += B2 * scale;
 
-      scale = 1.0 / sqrt((B3 * B3) + (B4 * B4) + (B5 * B5));
+      scale = 1.0 / Math.sqrt((B3 * B3) + (B4 * B4) + (B5 * B5));
       B3 *= scale;
       B4 *= scale;
       B5 *= scale;
@@ -423,7 +422,7 @@ class WebGLPhysicsPrivateBody implements ExternalAabbTreeNode {
       B7 += B4 * scale;
       B8 += B5 * scale;
 
-      scale = 1 / sqrt((B6 * B6) + (B7 * B7) + (B8 * B8));
+      scale = 1.0 / Math.sqrt((B6 * B6) + (B7 * B7) + (B8 * B8));
       B6 *= scale;
       B7 *= scale;
       B8 *= scale;
@@ -455,7 +454,7 @@ class WebGLPhysicsPrivateBody implements ExternalAabbTreeNode {
     }
 
 
-    calculateTransform(transform, [Vector3 origin]) {
+    void calculateTransform(Matrix43 transform, [Vector3 origin]) {
       var privateTransform = this._transform;
       if (origin != null) {
         privateTransform.negOffset(origin, transform);

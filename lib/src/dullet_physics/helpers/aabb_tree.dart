@@ -98,7 +98,7 @@ class AabbTreeNode {
   }
 
   bool isLeaf() {
-      return !!this.externalNode;
+      return this.externalNode != null;
   }
 
   void reset(double minX, double minY, double minZ, double maxX, double maxY, double maxZ,
@@ -1020,7 +1020,7 @@ class AabbTree {
                      (lastNodeIndex + lastNode.escapeNodeOffset - nodeIndex));
       } else {
           Aabb3 parentExtents = new Aabb3();
-          print(minX);
+          //print(minX);
           parentExtents.min.storage[0] = minX;
           parentExtents.min.storage[1] = minY;
           parentExtents.min.storage[2] = minZ;

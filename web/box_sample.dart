@@ -5,10 +5,11 @@ import'package:spectre/spectre.dart';
 
 import 'package:dullet_physics/dullet_physics.dart';
 import 'package:vector_math/vector_math.dart';
+import 'package:vector_math/vector_math_operations.dart';
 
 const double collisionMargin = 0.005;
 const double mass = 20.0;
-const int numCubes = 50;
+const int numCubes = 400;
 
 WebGLPhysicsWorld world;
 WebGLPhysicsCollisionObject obj;
@@ -119,6 +120,7 @@ void main() {
   gameLoop = new GameLoopHtml(frontBuffer);
   gameLoop.onUpdate = update;
   gameLoop.onRender = render;
+  initSimd();
   initGraphics();
   initDbullet();
 }
@@ -169,13 +171,15 @@ void initGraphics() {
   boxInputLayout = new InputLayout('box-inputLayout', device);
   boxInputLayout.mesh = boxMesh;
   boxInputLayout.shaderProgram = boxShader;
-  print(boxMesh.attributes);
+  //print(boxMesh.attributes);
 
 
   camera = new Camera();
   camera.position = new Vector3(7.0,5.0,7.0);
   camera.focusPosition = new Vector3.zero();
   camera.aspectRatio = frontBuffer.width.toDouble()/frontBuffer.height.toDouble();
+
+  setPerspectiveMatrix(projection, camera.FOV, camera.aspectRatio, camera.zNear, camera.zFar);
 
 
 
@@ -247,6 +251,18 @@ void update(GameLoopHtml loop) {
   //print(gameLoop.gameTime);
 }
 
+void initSimd() {
+  simdProjection = new Float32x4List.view(projection.storage.buffer);
+  simdProjectionView = new Float32x4List.view(projectionView.storage.buffer);
+  simdView = new Float32x4List.view(view.storage.buffer);
+}
+
+Float32x4List simdProjection;
+Float32x4List simdProjectionView;
+Float32x4List simdView;
+
+
+final Matrix4 projection = new Matrix4.zero();
 final Matrix4 projectionView = new Matrix4.zero();
 final Matrix4 view = new Matrix4.zero();
 final Matrix43 boxTransform = new Matrix43();
@@ -257,9 +273,14 @@ void render(GameLoopHtml loop) {
   context.reset();
 
   context.setViewport(viewPort);
-  camera.copyProjectionMatrix(projectionView);
+
+
+  //camera.copyProjectionMatrix(projectionView);
   camera.copyViewMatrix(view);
-  projectionView.multiply(view);
+  setViewMatrix(view, camera.position, camera.focusPosition, camera.upDirection);
+  //projectionView.multiply(view);
+
+  Matrix44SIMDOperations.multiply(simdProjectionView, 0, simdProjection, 0, simdView, 0);
   //debug.addCross(new Vector3.zero(), DebugDrawManager.ColorGreen);
 
 
@@ -288,8 +309,8 @@ void render(GameLoopHtml loop) {
     debug.addCross(box.position, DebugDrawManager.ColorGreen);
 
   }
-  debug.prepareForRender();
-  debug.render(camera);
+  //debug.prepareForRender();
+  //debug.render(camera);
 
 }
 

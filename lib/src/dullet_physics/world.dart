@@ -391,29 +391,24 @@ class WebGLPhysicsWorld /*implements PhysicsWorld*/ {
 
         // If supports are on opposite side of plane, primitive definately
         // intersects plane
-        if ((dot1 * dot2) <= 0)
-        {
-            return false;
+        if ((dot1 * dot2) <= 0) {
+          return false;
         }
 
         // Choose closest support to plane for distance computation
         // with margins.
         var seperation;
-        if ((dot1 * dot1) < (dot2 * dot2))
-        {
-            seperation = dot1;
-        }
-        else
-        {
-            seperation = dot2;
+        if ((dot1 * dot1) < (dot2 * dot2)) {
+          seperation = dot1;
+        } else {
+          seperation = dot2;
         }
 
-        if ((seperation < 0) != ((dot1 * dot2) < 0))
-        {
-            seperation = -seperation;
+        if ((seperation < 0) != ((dot1 * dot2) < 0)) {
+          seperation = -seperation;
         }
 
-        return (seperation - shape._collisionRadius) > 0;
+        return (seperation - shape._collisionRadius) > 0.0;
     }
 
     // Determine if pair of objects is permitted to collide.
@@ -971,7 +966,7 @@ class WebGLPhysicsWorld /*implements PhysicsWorld*/ {
     void _wakeConstraint(WebGLPhysicsConstraint constraint) {
         constraint._wakeTimeStamp = this._timeStamp + (this._midStep ? 0.0 : 1.0);
         if (!constraint._active) {
-            if (!constraint._island != null) {
+            if (!(constraint._island != null)) {
                 constraint._active = true;
                 this._activeConstraints.add(constraint);
 
@@ -2493,102 +2488,102 @@ class WebGLPhysicsWorld /*implements PhysicsWorld*/ {
         // distance of upperBound
         /*function */
         RayHit staticSweep(WebGLPhysicsShape shapeA, Matrix43 cpos, Vector3 delta, WebGLPhysicsShape shapeB, Matrix43 transform, double upperBound) {
-            var delta0 = delta[0];
-            var delta1 = delta[1];
-            var delta2 = delta[2];
+          var delta0 = delta[0];
+          var delta1 = delta[1];
+          var delta2 = delta[2];
 
-            var axis = cache.axis;
-            var supportA = cache.closestA;
-            var supportB = cache.closestB;
+          var axis = cache.axis;
+          var supportA = cache.closestA;
+          var supportB = cache.closestB;
 
-            //VMath.v3Neg(delta, cache.axis);
-            axis[0] = -delta0;
-            axis[1] = -delta1;
-            axis[2] = -delta2;
+          //VMath.v3Neg(delta, cache.axis);
+          axis[0] = -delta0;
+          axis[1] = -delta1;
+          axis[2] = -delta2;
 
-            cache.shapeA = shapeA;
-            cache.shapeB = shapeB;
+          cache.shapeA = shapeA;
+          cache.shapeB = shapeB;
 
-            double distance = 0.0;
+          double distance = 0.0;
 
-            var curIter = 0;
-            var maxIter = 100;
-            var contactDistance;
+          var curIter = 0;
+          var maxIter = 100;
+          var contactDistance;
 
-            var previousDistance = double.MAX_FINITE;//Number.MAX_VALUE;
-            bool intersected = false;
-            for (;;) {
-                var nextContact = that._contactPairTest(cache, cpos, transform);
+          var previousDistance = double.MAX_FINITE;//Number.MAX_VALUE;
+          bool intersected = false;
+          for (;;) {
+              var nextContact = that._contactPairTest(cache, cpos, transform);
 
-                // objects intersecting!
-                // abort and use previous result if existing
-                if (nextContact == null || nextContact < WebGLPhysicsConfig.GJK_EPA_DISTANCE_THRESHOLD)
-                {
-                    if (contactDistance != null || nextContact != null)
-                    {
-                        if (contactDistance == null)
-                        {
-                            contactDistance = nextContact;
-                        }
-                        intersected = true;
-                    }
-                    break;
-                }
+              // objects intersecting!
+              // abort and use previous result if existing
+              if (nextContact == null || nextContact < WebGLPhysicsConfig.GJK_EPA_DISTANCE_THRESHOLD)
+              {
+                  if (contactDistance != null || nextContact != null)
+                  {
+                      if (contactDistance == null)
+                      {
+                          contactDistance = nextContact;
+                      }
+                      intersected = true;
+                  }
+                  break;
+              }
 
-                // terminate if distance is increasing!!
-                if ((nextContact - previousDistance) >= 1)
-                {
-                    break;
-                }
-                previousDistance = nextContact;
+              // terminate if distance is increasing!!
+              if ((nextContact - previousDistance) >= 1)
+              {
+                  break;
+              }
+              previousDistance = nextContact;
 
-                // distance to advance object.
-                //var dot = VMath.v3Dot(delta, VMath.v3Sub(nextContact.closestB, nextContact.closestA));
-                double d0 = supportB.storage[0] - supportA.storage[0];
-                double d1 = supportB.storage[1] - supportA.storage[1];
-                double d2 = supportB.storage[2] - supportA.storage[2];
-                double dot = (delta0 * d0) + (delta1 * d1) + (delta2 * d2);
+              // distance to advance object.
+              //var dot = VMath.v3Dot(delta, VMath.v3Sub(nextContact.closestB, nextContact.closestA));
+              double d0 = supportB.storage[0] - supportA.storage[0];
+              double d1 = supportB.storage[1] - supportA.storage[1];
+              double d2 = supportB.storage[2] - supportA.storage[2];
+              double dot = (delta0 * d0) + (delta1 * d1) + (delta2 * d2);
 
-                // If seperating axis is perpendicular to direction of motion
-                // Then it is not possible for use to intersect with it.
-                if (dot <= WebGLPhysicsConfig.COPLANAR_THRESHOLD)
-                {
-                    break;
-                }
+              // If seperating axis is perpendicular to direction of motion
+              // Then it is not possible for use to intersect with it.
+              if (dot <= WebGLPhysicsConfig.COPLANAR_THRESHOLD)
+              {
+                  break;
+              }
 
-                var gap = (nextContact * nextContact) / dot;
-                distance += gap;
-                if (distance >= upperBound)
-                {
-                    contactDistance = null;
-                    break;
-                }
+              var gap = (nextContact * nextContact) / dot;
+              distance += gap;
+              if (distance >= upperBound)
+              {
+                  contactDistance = null;
+                  break;
+              }
 
-                contactDistance = nextContact;
-                cpos[9]  += (delta0 * gap);
-                cpos[10] += (delta1 * gap);
-                cpos[11] += (delta2 * gap);
+              contactDistance = nextContact;
+              cpos[9]  += (delta0 * gap);
+              cpos[10] += (delta1 * gap);
+              cpos[11] += (delta2 * gap);
 
-                // Exit if distance between objects is nominal
-                if (contactDistance <= WebGLPhysicsConfig.GJK_EPA_DISTANCE_THRESHOLD)
-                {
-                    intersected = true;
-                    break;
-                }
+              // Exit if distance between objects is nominal
+              if (contactDistance <= WebGLPhysicsConfig.GJK_EPA_DISTANCE_THRESHOLD)
+              {
+                  intersected = true;
+                  break;
+              }
 
-                // Max iteration cutoff.
-                curIter += 1;
-                if (curIter > maxIter)
-                {
-                    break;
-                }
-            }
+              // Max iteration cutoff.
+              curIter += 1;
+              if (curIter > maxIter)
+              {
+                  break;
+              }
+          }
 
-            if (contactDistance == null || !intersected) {
-                return null;
-            } else {
-                return new RayHit(supportB.clone(),axis.clone(),distance);
-            }
+          if (contactDistance == null || !intersected) {
+            return null;
+          } else {
+            return new RayHit(supportB.clone(),axis.clone(),distance);
+          }
         }
 
         shape = shape;
@@ -2640,8 +2635,7 @@ class WebGLPhysicsWorld /*implements PhysicsWorld*/ {
 
         var minResult = null;
         var i, j;
-        for (i = 0; i < limit; i += 1)
-        {
+        for (i = 0; i < limit; i += 1) {
             var object = objects[i];
             // Prevent GC issues from persistant list.
             objects[i] = null;
@@ -2650,123 +2644,119 @@ class WebGLPhysicsWorld /*implements PhysicsWorld*/ {
             // TODO: remove cast
             var actual_object = object;//(<any>object);
             if (actual_object == exclude || object._shape == shape ||
-               (object._mask & group) == 0 || (object._group & mask) == 0)
-            {
-                continue;
+               (object._mask & group) == 0 || (object._group & mask) == 0) {
+              continue;
             }
             /*jshint bitwise: true*/
 
             RayHit result;
             var collisionShape = object._shape;
-            if (collisionShape is WebGLPhysicsTriangleMeshShape/*.type == "TRIANGLE_MESH"*/)
-            {
+            if (collisionShape is WebGLPhysicsTriangleMeshShape/*.type == "TRIANGLE_MESH"*/) {
                 // TODO: remove cast and fix
                 var triangleArray = (collisionShape as WebGLPhysicsTriangleMeshShape).triangleArray;//(<any>collisionShape).triangleArray;
                 triangle.triangleArray = triangleArray;
                 // TODO: remove cast and fix
                 triangle.collisionRadius = collisionShape._collisionRadius;//(<any>collisionShape).collisionRadius;
-
                 var numTriangles;
-                if (triangleArray.spatialMap != null)
-                {
-                    // Find AABB encompassing swept shape, in local coordinate system of triangle mesh.
+                if (triangleArray.spatialMap != null) {
+                  // Find AABB encompassing swept shape, in local coordinate system of triangle mesh.
                   object._transform.inverseOrthonormal(transform2);
-                    //VMath.m43InverseOrthonormal(object._transform, transform2);
+                  //VMath.m43InverseOrthonormal(object._transform, transform2);
 
-                    //VMath.m43Mul(from, transform2, transform);
-                    from.multiply(transform2, transform);
+                  //VMath.m43Mul(from, transform2, transform);
+                  from.multiply(transform2, transform);
 
-                    fakeBody._transform = transform;
-                    calculateExtents.call(fakeBody, fromExtents);
+                  fakeBody._transform = transform;
+                  calculateExtents.call(fakeBody, fromExtents);
 
-                    //VMath.m43Mul(to, transform2, transform);
-                    to.multiply(transform2, transform);
-                    calculateExtents.call(fakeBody, toExtents);
+                  //VMath.m43Mul(to, transform2, transform);
+                  to.multiply(transform2, transform);
+                  calculateExtents.call(fakeBody, toExtents);
 
-                    //var extents = VMath.aabbUnion(fromExtents, toExtents);
-                    extents.min.storage[0] = (fromExtents.min.storage[0] < toExtents.min.storage[0] ? fromExtents.min.storage[0] : toExtents.min.storage[0]);
-                    extents.min.storage[1] = (fromExtents.min.storage[1] < toExtents.min.storage[1] ? fromExtents.min.storage[1] : toExtents.min.storage[1]);
-                    extents.min.storage[2] = (fromExtents.min.storage[2] < toExtents.min.storage[2] ? fromExtents.min.storage[2] : toExtents.min.storage[2]);
-                    extents.max.storage[0] = (fromExtents.max.storage[0] > toExtents.max.storage[0] ? fromExtents.max.storage[0] : toExtents.max.storage[0]);
-                    extents.max.storage[1] = (fromExtents.max.storage[1] > toExtents.max.storage[1] ? fromExtents.max.storage[1] : toExtents.max.storage[1]);
-                    extents.max.storage[2] = (fromExtents.max.storage[2] > toExtents.max.storage[2] ? fromExtents.max.storage[2] : toExtents.max.storage[2]);
+                  //var extents = VMath.aabbUnion(fromExtents, toExtents);
+                  extents.min.storage[0] = (fromExtents.min.storage[0] < toExtents.min.storage[0] ? fromExtents.min.storage[0] : toExtents.min.storage[0]);
+                  extents.min.storage[1] = (fromExtents.min.storage[1] < toExtents.min.storage[1] ? fromExtents.min.storage[1] : toExtents.min.storage[1]);
+                  extents.min.storage[2] = (fromExtents.min.storage[2] < toExtents.min.storage[2] ? fromExtents.min.storage[2] : toExtents.min.storage[2]);
+                  extents.max.storage[0] = (fromExtents.max.storage[0] > toExtents.max.storage[0] ? fromExtents.max.storage[0] : toExtents.max.storage[0]);
+                  extents.max.storage[1] = (fromExtents.max.storage[1] > toExtents.max.storage[1] ? fromExtents.max.storage[1] : toExtents.max.storage[1]);
+                  extents.max.storage[2] = (fromExtents.max.storage[2] > toExtents.max.storage[2] ? fromExtents.max.storage[2] : toExtents.max.storage[2]);
 
-                    numTriangles = triangleArray.spatialMap.getOverlappingNodes(extents, triangles, 0);
-                    for (j = 0; j < numTriangles; j += 1) {
-                      triangle.index = triangles[j].index;
-                      // avoid GC problems of persistant array.
-                      triangles[j] = null;
+                  numTriangles = triangleArray.spatialMap.getOverlappingNodes(extents, triangles, 0);
+                  for (j = 0; j < numTriangles; j += 1) {
+                    triangle.index = triangles[j].index;
+                    // avoid GC problems of persistant array.
+                    triangles[j] = null;
 
-                      //VMath.m43Copy(from, transform2);
-                      from.copyInto(transform2);
-                      result = staticSweep(shape, transform2, delta, triangle, object._transform, upperBound);
-                      if (result != null) {
-                        result.collisionObject = actual_object;
-                        result.body = null;
+                    //VMath.m43Copy(from, transform2);
+                    from.copyInto(transform2);
+                    result = staticSweep(shape, transform2, delta, triangle, object._transform, upperBound);
+                    if (result != null) {
+                      result.collisionObject = actual_object;
+                      result.body = null;
 
-                        if (callback == null /*|| callback(result)*/) {
-                          minResult = result;
-                          upperBound = result.distance;
-                        } else if(callback(result)) {
-                          minResult = result;
-                          upperBound = result.distance;
-                        }
+                      if (callback == null /*|| callback(result)*/) {
+                        minResult = result;
+                        upperBound = result.distance;
+                      } else if(callback(result)) {
+                        minResult = result;
+                        upperBound = result.distance;
                       }
                     }
+                  }
                 } else {
-                    numTriangles = triangleArray.numTriangles;
-                    for (j = 0; j < numTriangles; j += 1) {
-                        triangle.index = (j * WebGLPhysicsPrivateTriangleArray.TRIANGLE_SIZE);
-                        //VMath.m43Copy(from, transform2);
-                        from.copyInto(transform2);
-                        result = staticSweep(shape, transform2, delta, triangle, object._transform, upperBound);
-                        if (result != null ) {
-                            result.collisionObject = actual_object;
-                            result.body = null;
+                  numTriangles = triangleArray.numTriangles;
+                  for (j = 0; j < numTriangles; j += 1) {
+                    triangle.index = (j * WebGLPhysicsPrivateTriangleArray.TRIANGLE_SIZE);
+                    //VMath.m43Copy(from, transform2);
+                    from.copyInto(transform2);
+                    result = staticSweep(shape, transform2, delta, triangle, object._transform, upperBound);
+                    if (result != null ) {
+                      result.collisionObject = actual_object;
+                      result.body = null;
 
-                            if (callback == null /*|| callback(result)*/) {
-                              minResult = result;
-                              upperBound = result.distance;
-                            } else if(callback(result)) {
-                              minResult = result;
-                              upperBound = result.distance;
-                            }
-                        }
+                      if (callback == null /*|| callback(result)*/) {
+                        minResult = result;
+                        upperBound = result.distance;
+                      } else if(callback(result)) {
+                        minResult = result;
+                        upperBound = result.distance;
+                      }
                     }
+                  }
                 }
             } else {
                 from.copyInto(transform2);
                 result = staticSweep(shape, transform2, delta, collisionShape, object._transform, upperBound);
                 if (result != null) {
-                    // TODO: remove cast and fix
-                    if (object._collisionObject) { //((<any>object)._collisionObject)
-                        result.collisionObject = actual_object;
-                        result.body = null;
-                    } else {
-                        result.collisionObject = null;
-                        result.body = actual_object;
-                    }
+                  // TODO: remove cast and fix
+                  if (object._collisionObject) { //((<any>object)._collisionObject)
+                    result.collisionObject = actual_object;
+                    result.body = null;
+                  } else {
+                    result.collisionObject = null;
+                    result.body = actual_object;
+                  }
 
-                    if (callback == null /*|| callback(result)*/) {
-                      minResult = result;
-                      upperBound = result.distance;
-                    } else if(callback(result)) {
-                      minResult = result;
-                      upperBound = result.distance;
-                    }
+                  if (callback == null /*|| callback(result)*/) {
+                    minResult = result;
+                    upperBound = result.distance;
+                  } else if(callback(result)) {
+                    minResult = result;
+                    upperBound = result.distance;
+                  }
                 }
             }
 
             // Cut off on epsilon distance
             // Based on rough experimental result
             if (upperBound < 1e-4) {
-                // clean up remaining objects for GC
-                for (j = i; j < limit; j += 1)
-                {
-                    objects[j] = null;
-                }
+              // clean up remaining objects for GC
+              for (j = i; j < limit; j += 1)
+              {
+                  objects[j] = null;
+              }
 
-                break;
+              break;
             }
         }
 
