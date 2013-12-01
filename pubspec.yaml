@@ -4,6 +4,7 @@ dependencies:
   vector_math:
     git: https://github.com/johnmccutchan/vector_math.git
 dev_dependencies:
+  analyzer_experimental: any
   game_loop:
     git: https://github.com/johnmccutchan/game_loop.git
   spectre:

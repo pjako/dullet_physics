@@ -44,7 +44,7 @@ class WebGLContactEPA {
     face.leaf0 = null;
     face.leaf1 = list.root;
     if (list.root != null) {
-        list.root.leaf0 = face;
+      list.root.leaf0 = face;
     }
     list.root = face;
     list.count += 1;
@@ -66,16 +66,16 @@ class WebGLContactEPA {
   }
 
   ContactFace findBest() {
-      var minFace = this.hull.root;
-      var minDistance = minFace.distance * minFace.distance;
-      for (ContactFace f = minFace.leaf1; f != null; f = f.leaf1) {
-        var sqDistance = f.distance * f.distance;
-        if (sqDistance < minDistance) {
-          minFace = f;
-          minDistance = sqDistance;
-        }
+    var minFace = this.hull.root;
+    var minDistance = minFace.distance * minFace.distance;
+    for (ContactFace f = minFace.leaf1; f != null; f = f.leaf1) {
+      var sqDistance = f.distance * f.distance;
+      if (sqDistance < minDistance) {
+        minFace = f;
+        minDistance = sqDistance;
       }
-      return minFace;
+    }
+    return minFace;
   }
 
   double getEdgeDistance(ContactFace face, int a, int b) {
@@ -113,15 +113,17 @@ class WebGLContactEPA {
       if (dotA >= 0.0) {
         //outside of vertex A
         return Math.sqrt((a0 * a0) + (a1 * a1) + (a2 * a2));
-      } else if (dotB <= 0.0) {
-        //outside of vertex B
-        return Math.sqrt((b0 * b0) + (b1 * b1) + (b2 * b2));
       } else {
-        var dotAB = ((a0 * b0) + (a1 * b1) + (a2 * b2));
-        var dSq = (((a0 * a0) + (a1 * a1) + (a2 * a2)) *
-                  ((b0 * b0) + (b1 * b1) + (b2 * b2))) -
-                  (dotAB * dotAB);
-        return dSq >= 0.0 ? Math.sqrt(dSq / lengthSqBA) : 0.0;
+        if (dotB <= 0.0) {
+          //outside of vertex B
+          return Math.sqrt((b0 * b0) + (b1 * b1) + (b2 * b2));
+        } else {
+          var dotAB = ((a0 * b0) + (a1 * b1) + (a2 * b2));
+          var dSq = (((a0 * a0) + (a1 * a1) + (a2 * a2)) *
+           ((b0 * b0) + (b1 * b1) + (b2 * b2))) -
+           (dotAB * dotAB);
+          return dSq >= 0.0 ? Math.sqrt(dSq / lengthSqBA) : 0.0;
+        }
       }
     } else {
       return null;
@@ -233,7 +235,7 @@ class WebGLContactEPA {
         var edge2 = (edge + 2) % 3;
         face.pass = pass;
         if (expandFace(pass, w, face.adjFace[edge1], face.edge[edge1], horizon) &&
-            expandFace(pass, w, face.adjFace[edge2], face.edge[edge2], horizon)) {
+         expandFace(pass, w, face.adjFace[edge2], face.edge[edge2], horizon)) {
           remove(this.hull, face);
           append(this.stock, face);
           return true;
@@ -282,8 +284,8 @@ class WebGLContactEPA {
     var c2 = gjkSimplex[20] - d2;
 
     if (((a0 * ((b1 * c2) - (b2 * c1))) +
-         (a1 * ((b2 * c0) - (b0 * c2))) +
-         (a2 * ((b0 * c1) - (b1 * c0)))) < 0.0) {
+     (a1 * ((b2 * c0) - (b0 * c2))) +
+     (a2 * ((b0 * c1) - (b1 * c0)))) < 0.0) {
       ind0 = 9;
       ind1 = 0;
     } else {
@@ -417,7 +419,7 @@ class WebGLContactEPA {
       vertices[w + 6] = b0;
       vertices[w + 7] = b1;
       vertices[w + 8] = b2;
-      vertices[w]     = w0 = (a0 - b0);
+      vertices[w] = w0 = (a0 - b0);
       vertices[w + 1] = w1 = (a1 - b1);
       vertices[w + 2] = w2 = (a2 - b2);
 
@@ -458,15 +460,15 @@ class WebGLContactEPA {
     c1 = best.vertex[1];
     c2 = best.vertex[2];
 
-    var x0 = vertices[c0]     - p0;
+    var x0 = vertices[c0] - p0;
     var x1 = vertices[c0 + 1] - p1;
     var x2 = vertices[c0 + 2] - p2;
 
-    var y0 = vertices[c1]     - p0;
+    var y0 = vertices[c1] - p0;
     var y1 = vertices[c1 + 1] - p1;
     var y2 = vertices[c1 + 2] - p2;
 
-    var z0 = vertices[c2]     - p0;
+    var z0 = vertices[c2] - p0;
     var z1 = vertices[c2 + 1] - p1;
     var z2 = vertices[c2 + 2] - p2;
 
@@ -519,7 +521,7 @@ class Horizon {
 
 class ContactFace {
   final Vector3 normal = new Vector3.zero();
-  double distance =  0.0;
+  double distance = 0.0;
   final Uint16List vertex = new Uint16List(3);
   final List<ContactFace> adjFace = new List<ContactFace>(3);
   final Uint16List edge = new Uint16List(3);

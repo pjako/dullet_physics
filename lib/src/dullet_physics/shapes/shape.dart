@@ -53,8 +53,8 @@ abstract class WebGLPhysicsShape {
 */
 
 
-  // From orgin
-  /*
+// From orgin
+/*
    *     static version = 1;
 
     // From Physics Shape

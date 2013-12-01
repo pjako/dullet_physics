@@ -3,175 +3,176 @@ part of dullet_physics;
 //
 // WebGL Physics Collision Object
 //
-class WebGLPhysicsCollisionObject extends WebGLPhysicsPrivateBody// PhysicsCollisionObject
+class WebGLPhysicsCollisionObject extends WebGLPhysicsPrivateBody  // PhysicsCollisionObject
 {
-    static const version = 1;
-    //WebGLPhysicsPrivateBody _private;
+  static const version = 1;
+  //WebGLPhysicsPrivateBody _private;
 
-    // From PhysicsCollisionObject
-    //var transform; // m43
-    /*WebGL*/
-    WebGLPhysicsShape get shape => _shape;
-    //WebGLPhysicsShape _shape;
-    //int group;  // getter for group
-    //int mask;   // getter for mask
-    //double friction; // getter for friction
-    //double restitution; // getter for restitution
-    //bool kinematic; // getter for kinematic
-    dynamic userData;
+  // From PhysicsCollisionObject
+  //var transform; // m43
+  /*WebGL*/
+  WebGLPhysicsShape get shape => _shape;
+  //WebGLPhysicsShape _shape;
+  //int group;  // getter for group
+  //int mask;   // getter for mask
+  //double friction; // getter for friction
+  //double restitution; // getter for restitution
+  //bool kinematic; // getter for kinematic
+  dynamic userData;
 
-    //Float32List inverseInertia;
-    //double inverseMass;
-    //Float32List velocity;
+  //Float32List inverseInertia;
+  //double inverseMass;
+  //Float32List velocity;
 
-    //WebGLPhysicsWorld world;
+  //WebGLPhysicsWorld world;
 
-    //WebGLPhysicsContactCallbacks contactCallbacks;
+  //WebGLPhysicsContactCallbacks contactCallbacks;
 
-    //bool sweepFrozen;
+  //bool sweepFrozen;
 
-    //_private: WebGLPhysicsPrivateBody;
-    //_public: any;  // TODO: what's this.  Seems to be refered to.
+  //_private: WebGLPhysicsPrivateBody;
+  //_public: any;  // TODO: what's this.  Seems to be refered to.
 
-    // TODO: make this private
-    static final Vector3 sharedInverseInertiaLocal = new Vector3.zero();
-    static final Matrix3 sharedInverseInertia = new Matrix3.identity();
+  // TODO: make this private
+  static final Vector3 sharedInverseInertiaLocal = new Vector3.zero();
+  static final Matrix3 sharedInverseInertia = new Matrix3.identity();
 
-    void calculateExtents(Aabb3 extents){
-        this._calculateExtents(extents);
-    }
+  void calculateExtents(Aabb3 extents) {
+    this._calculateExtents(extents);
+  }
 
-    clone() {
-        return new WebGLPhysicsCollisionObject(
-            shape: _shape,
-            /*onPreSolveContact: _onPreSolveContact,
+  clone() {
+    return new WebGLPhysicsCollisionObject(
+    shape: _shape,
+     /*onPreSolveContact: _onPreSolveContact,
             onAddedContacts: _onAddedContacts,
             onProcessedContacts: _onProcessedContacts,
             onRemovedContacts: _onRemovedContacts,*/
-            group: _group,
-            mask: _mask,
-            kinematic: _kinematic,
-            userData: userData);
-    }
-    int get group => _group;
-    //int _group;
-    int get mask => _mask;
-    //int _mask;
-    Matrix43 get transform => _transform.clone();
-    void set transform(Matrix43 transform) {
-      var pr = this;
-      // can only set transform if kinematic, or else for non kinematic IF NOT in a world.
-      if (pr._kinematic || !pr._world) {
-        MathHelper.m43Copy(pr._transform, pr._transform);
-        if (pr._world != null) {
-          pr._world._wakeBody(pr);
-        }
+    group: _group,
+     mask: _mask,
+     kinematic: _kinematic,
+     userData: userData);
+  }
+  int get group => _group;
+  //int _group;
+  int get mask => _mask;
+  //int _mask;
+  Matrix43 get transform => _transform.clone();
+  void set transform(Matrix43 transform) {
+    var pr = this;
+    // can only set transform if kinematic, or else for non kinematic IF NOT in a world.
+    if (pr._kinematic || !pr._world) {
+      MathHelper.m43Copy(pr._transform, pr._transform);
+      if (pr._world != null) {
+        pr._world._wakeBody(pr);
       }
     }
-    double get friction => _friction;
-    void set friction(double friction) {
-      var pr = this;
-      pr._friction = friction;
+  }
+  double get friction => _friction;
+  void set friction(double friction) {
+    var pr = this;
+    pr._friction = friction;
 
-      // Invalidate arbiter friction values.
-      var arbiters = pr._arbiters;
-      var i;
-      var limit = arbiters.length;
-      for (i = 0; i < limit; i += 1) {
-        arbiters[i].invalidateParameters();
-      }
+    // Invalidate arbiter friction values.
+    var arbiters = pr._arbiters;
+    var i;
+    var limit = arbiters.length;
+    for (i = 0; i < limit; i += 1) {
+      arbiters[i].invalidateParameters();
     }
-    double get restitution => _restitution;
-    void set restitution(double restitution) {
-      var pr = this;
-      pr._restitution = restitution;
+  }
+  double get restitution => _restitution;
+  void set restitution(double restitution) {
+    var pr = this;
+    pr._restitution = restitution;
 
-      // Invalidate arbiter restitution values.
-      var arbiters = pr._arbiters;
-      var i;
-      var limit = arbiters.length;
-      for (i = 0; i < limit; i += 1) {
-        arbiters[i].invalidateParameters();
-      }
+    // Invalidate arbiter restitution values.
+    var arbiters = pr._arbiters;
+    var i;
+    var limit = arbiters.length;
+    for (i = 0; i < limit; i += 1) {
+      arbiters[i].invalidateParameters();
     }
-    //bool _kinematic;
-    bool get kinematic => _kinematic;
-    WebGLPhysicsCollisionObject({
-      WebGLPhysicsShape shape,
-      Matrix43 transform,
-      double friction: 0.5,
-      double restitution: 0.0,
-      Vector3 linearVelocity,
-      Vector3 angularVelocity,
-      double linearDamping: 0.0,
-      double angularDamping: 0.0,
-      ContactCallback onPreSolveContact,
-      ContactCallback onAddedContacts,
-      ContactCallback onProcessedContacts,
-      ContactCallback onRemovedContacts,
-      int group: WebGLPhysicsDevice.FILTER_STATIC,
-      int mask: WebGLPhysicsDevice.FILTER_ALL ^ WebGLPhysicsDevice.FILTER_STATIC,
-      bool kinematic: false,
-      dynamic userData}) : super(
-          shape,
-          transform,
-          linearVelocity,
-          angularVelocity,
-          friction,
-          restitution,
-          linearDamping,
-          angularDamping) {
+  }
+  //bool _kinematic;
+  bool get kinematic => _kinematic;
+  WebGLPhysicsCollisionObject({
+  WebGLPhysicsShape shape, 
+  Matrix43 transform, 
+  double friction: 0.5, 
+  double restitution: 0.0, 
+  Vector3 linearVelocity, 
+  Vector3 angularVelocity, 
+  double linearDamping: 0.0, 
+  double angularDamping: 0.0, 
+  ContactCallback onPreSolveContact, 
+  ContactCallback onAddedContacts, 
+  ContactCallback onProcessedContacts, 
+  ContactCallback onRemovedContacts, 
+  int group: WebGLPhysicsDevice.FILTER_STATIC, 
+  int mask: WebGLPhysicsDevice.FILTER_ALL ^ WebGLPhysicsDevice.FILTER_STATIC, 
+  bool kinematic: false, 
+  dynamic userData})
+      : super(
+      shape,
+       transform,
+       linearVelocity,
+       angularVelocity,
+       friction,
+       restitution,
+       linearDamping,
+       angularDamping) {
 
 
-        //var s = new WebGLPhysicsPrivateBody(params, rets);
-        //rets._private = s;
+    //var s = new WebGLPhysicsPrivateBody(params, rets);
+    //rets._private = s;
 
-        //read/write, no side effects
-        userData = userData;
+    //read/write, no side effects
+    userData = userData;
 
-        // read only, no getter needed
-        //_shape = shape;
+    // read only, no getter needed
+    //_shape = shape;
 
-        _group = group;
-        _mask = mask;
+    _group = group;
+    _mask = mask;
 
-        _kinematic = kinematic;
+    _kinematic = kinematic;
 
-        //--------------------------------
-        // set private collision object properties
+    //--------------------------------
+    // set private collision object properties
 
-        _group = group;
-        _mask = mask;
+    _group = group;
+    _mask = mask;
 
-        _fixedRotation = !kinematic;
+    _fixedRotation = !kinematic;
 
-        _mass = 0.0;
-        _inverseMass = 0.0;
+    _mass = 0.0;
+    _inverseMass = 0.0;
 
-        _inverseInertiaLocal = WebGLPhysicsCollisionObject.sharedInverseInertiaLocal;
-        _inverseInertia = WebGLPhysicsCollisionObject.sharedInverseInertia;
+    _inverseInertiaLocal = WebGLPhysicsCollisionObject.sharedInverseInertiaLocal;
+    _inverseInertia = WebGLPhysicsCollisionObject.sharedInverseInertia;
 
-        _collisionObject = true;
+    _collisionObject = true;
 
-        // Kinematic/Static object is not permitted to sleep in the normal sense.
-        _permitSleep = false;
-        // Kinematic/Static objects are not subject to manipulation by continuous
-        // collision detection.
-        _sweepFrozen = true;
+    // Kinematic/Static object is not permitted to sleep in the normal sense.
+    _permitSleep = false;
+    // Kinematic/Static objects are not subject to manipulation by continuous
+    // collision detection.
+    _sweepFrozen = true;
 
-        // Object default active state is true iff object is kinematic.
-        // static object is always 'inactive'
-        _active = kinematic;
+    // Object default active state is true iff object is kinematic.
+    // static object is always 'inactive'
+    _active = kinematic;
 
-        // prepare for contact callbacks
-        if (onPreSolveContact != null || onAddedContacts != null || onProcessedContacts != null || onRemovedContacts != null) {
-            _contactCallbacks = new WebGLPhysicsContactCallbacks(
-                onAddedContacts: onAddedContacts,
-                onProcessedContacts: onProcessedContacts,
-                onRemovedContacts: onRemovedContacts,
-                mask: mask);
-        }
+    // prepare for contact callbacks
+    if (onPreSolveContact != null || onAddedContacts != null || onProcessedContacts != null || onRemovedContacts != null) {
+      _contactCallbacks = new WebGLPhysicsContactCallbacks(
+      onAddedContacts: onAddedContacts,
+       onProcessedContacts: onProcessedContacts,
+       onRemovedContacts: onRemovedContacts,
+       mask: mask);
     }
+  }
 /*
     static create(params: any): WebGLPhysicsCollisionObject
     {

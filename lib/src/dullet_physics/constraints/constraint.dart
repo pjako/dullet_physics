@@ -7,70 +7,71 @@ part of dullet_physics;
 //
 class WebGLPhysicsConstraint /*implements PhysicsConstraint*/
 {
-    static const int version = 1;
+  static const int version = 1;
 
-    WebGLPhysicsIsland _island;
-    double _wakeTimeStamp;
+  WebGLPhysicsIsland _island;
+  double _wakeTimeStamp;
 
-    // PhysicsConstraint
-    WebGLPhysicsPrivateBody bodyA;
-    WebGLPhysicsPrivateBody bodyB;
-    Float32List transformA;// : any; // m43
-    Float32List transformB;// : any; // m43
-    //String type;
+  // PhysicsConstraint
+  WebGLPhysicsPrivateBody bodyA;
+  WebGLPhysicsPrivateBody bodyB;
+  Float32List transformA;// : any; // m43
+  Float32List transformB;// : any; // m43
+  //String type;
 
-    WebGLPhysicsWorld _world;
-    bool _active;
-    WebGLPhysicsConstraint _islandRoot;
-    int _islandRank;
-    dynamic userData;
+  WebGLPhysicsWorld _world;
+  bool _active;
+  WebGLPhysicsConstraint _islandRoot;
+  int _islandRank;
+  dynamic userData;
 
-    //var _private;
+  //var _private;
 
-    preStep(double timeStepRatio, double timeStep) {
+  preStep(double timeStepRatio, double timeStep) {
 
-    }
+  }
 
-    applyCachedImpulses() {
-    }
+  applyCachedImpulses() {
+  }
 
-    computeAndApplyImpulses() {
-    }
+  computeAndApplyImpulses() {
+  }
 
-    WebGLPhysicsConstraint({
-      WebGLPhysicsPrivateBody bodyA,
-      WebGLPhysicsPrivateBody bodyB,
-      bool active
-    }) {
-        var s = this;
+  WebGLPhysicsConstraint({
+  WebGLPhysicsPrivateBody bodyA, 
+  WebGLPhysicsPrivateBody bodyB, 
+  bool active}
+  ) {
+    var s = this;
 
-        s._world = null;
-        s.userData = null;
+    s._world = null;
+    s.userData = null;
 
-        //webGLPhysicsClone(s, params);
-        //s.type = type;
-
-
-        //initConstraintProperties
-        var pc = this;
-        pc._world = null;
-
-        pc.bodyA = bodyA;
-        pc.bodyB = bodyB;
-        pc._active  = active;
+    //webGLPhysicsClone(s, params);
+    //s.type = type;
 
 
-    }
-    bool get active => this._active;
-    void set active(bool bActive) {
-      var pc = this;
-      if (bActive == pc._active) {
-        // If already active, and in a world then allow re-setting to true
-        // to update wakeTimeStamp.
-        if (pc._world != null && bActive) {
-          pc._wakeTimeStamp = pc._world._timeStamp;
-        }
-      } else if (pc._world != null) {
+    //initConstraintProperties
+    var pc = this;
+    pc._world = null;
+
+    pc.bodyA = bodyA;
+    pc.bodyB = bodyB;
+    pc._active = active;
+
+
+  }
+  bool get active => this._active;
+  void set active(bool bActive) {
+    var pc = this;
+    if (bActive == pc._active) {
+      // If already active, and in a world then allow re-setting to true
+      // to update wakeTimeStamp.
+      if (pc._world != null && bActive) {
+        pc._wakeTimeStamp = pc._world._timeStamp;
+      }
+    } else {
+      if (pc._world != null) {
         // If in a world, and not already active then wake the constraint.
         if (bActive) {
           pc._world._wakeConstraint(pc);
@@ -85,6 +86,7 @@ class WebGLPhysicsConstraint /*implements PhysicsConstraint*/
         pc._active = bActive;
       }
     }
+  }
 }
 /*
 // Decorate constraint with getter/setters for bodyA/bodyB

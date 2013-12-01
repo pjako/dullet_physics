@@ -9,20 +9,21 @@ part of dullet_physics;
 // TODO: inherit from WebGLPhysicsCollisionObject
 
 class WebGLPhysicsRigidBody extends WebGLPhysicsPrivateBody /*implements PhysicsRigidBody*/ {
-    static const int version = 1;
-    dynamic userData;
-    bool get active => _active;
-    void set active(bool active_) {
-      var pr = this;
-      if (active_ == pr._active)
-      {
-        // If already active, and in a world then allow re-settnig to true
-        // to update wakeTimeStamp.
-        if (pr._world != null && active_)
-        {
-          pr._wakeTimeStamp = pr._world._timeStamp;
-        }
-      } else if (pr._world != null) {
+  static const int version = 1;
+  dynamic userData;
+  bool get active => _active;
+  void set active(bool active_) {
+    var pr = this;
+    if (active_ == pr._active)
+     {
+      // If already active, and in a world then allow re-settnig to true
+      // to update wakeTimeStamp.
+      if (pr._world != null && active_)
+       {
+        pr._wakeTimeStamp = pr._world._timeStamp;
+      }
+    } else {
+      if (pr._world != null) {
         // If in a world, and not already active then wake the body.
         if (active_) {
           pr._world._wakeBody(pr);
@@ -56,226 +57,226 @@ class WebGLPhysicsRigidBody extends WebGLPhysicsPrivateBody /*implements Physics
         pr._active = active_;
       }
     }
+  }
 
-    // From PhysicsCollisionObject
-    //Float32List transform; // m43
-    Matrix43 get transform => _transform.clone();
-    void set transform(Matrix43 transform) {
-      var pr = this;
-      transform.copyInto(pr._transform);
-      //MathHelper.m43Copy(transform, pr._transform);
+  Matrix43 get transform => _transform.clone();
+  void set transform(Matrix43 transform) {
+    var pr = this;
+    transform.copyInto(pr._transform);
+    //MathHelper.m43Copy(transform, pr._transform);
 
-      // Ensure any arbiter's have their skipDiscreteCollisions flags set to false as
-      // new contacts 'will' be needed.
-      var arbiters = pr._arbiters;
-      var i;
-      var limit = arbiters.length;
-      for (i = 0; i < limit; i += 1) {
-        arbiters[i].skipDiscreteCollisions = false;
-      }
+    // Ensure any arbiter's have their skipDiscreteCollisions flags set to false as
+    // new contacts 'will' be needed.
+    var arbiters = pr._arbiters;
+    var i;
+    var limit = arbiters.length;
+    for (i = 0; i < limit; i += 1) {
+      arbiters[i].skipDiscreteCollisions = false;
     }
-    int get group => _group;  // getter for group
-    int get mask => _mask;   // getter for mask
-    //int friction; // getter for friction
-    double get friction => _friction;
-    void set friction(double fricton) {
-      var pr = this;
-      pr._friction = friction;
+  }
+  int get group => _group; // getter for group
+  int get mask => _mask; // getter for mask
+  //int friction; // getter for friction
+  double get friction => _friction;
+  void set friction(double fricton) {
+    var pr = this;
+    pr._friction = friction;
 
-      // Invalidate arbiter friction values.
-      var arbiters = pr._arbiters;
-      var i;
-      var limit = arbiters.length;
-      for (i = 0; i < limit; i += 1) {
-        arbiters[i].invalidateParameters();
-      }
-
+    // Invalidate arbiter friction values.
+    var arbiters = pr._arbiters;
+    var i;
+    var limit = arbiters.length;
+    for (i = 0; i < limit; i += 1) {
+      arbiters[i].invalidateParameters();
     }
 
+  }
 
 
-    //int restitution; // getter for restitution
-    double get restitution => _restitution;
-    void set restitution(double restitution) {
-      var pr = this;
-      pr._restitution = restitution;
 
-      // Invalidate arbiter restitution values.
-      var arbiters = pr._arbiters;
-      var i;
-      var limit = arbiters.length;
-      for (i = 0; i < limit; i += 1)
-      {
-        arbiters[i].invalidateParameters();
-      }
+  //int restitution; // getter for restitution
+  double get restitution => _restitution;
+  void set restitution(double restitution) {
+    var pr = this;
+    pr._restitution = restitution;
+
+    // Invalidate arbiter restitution values.
+    var arbiters = pr._arbiters;
+    var i;
+    var limit = arbiters.length;
+    for (i = 0; i < limit; i += 1)
+     {
+      arbiters[i].invalidateParameters();
     }
-    //booMematic; // getter for kinematic
+  }
+  //booMematic; // getter for kinematic
 
-    // From WebGLPhysicsRigidBody
-    //Float32List linearVelocity; // v3
-    //Float32List angularVelocity; // v3
-    Vector3 get angularVelocity {
-      var vel = this._velocity;
-      return new Vector3(vel.storage[3], vel.storage[4], vel.storage[5]);
-    }
-    void set angularVelocity(Vector3 angularVelocity_) {
-      var vel = this._velocity;
-      vel.storage[3] = angularVelocity_.storage[0];
-      vel.storage[4] = angularVelocity_.storage[1];
-      vel.storage[5] = angularVelocity_.storage[2];
-    }
+  // From WebGLPhysicsRigidBody
+  //Float32List linearVelocity; // v3
+  //Float32List angularVelocity; // v3
+  Vector3 get angularVelocity {
+    var vel = this._velocity;
+    return new Vector3(vel.storage[3], vel.storage[4], vel.storage[5]);
+  }
+  void set angularVelocity(Vector3 angularVelocity_) {
+    var vel = this._velocity;
+    vel.storage[3] = angularVelocity_.storage[0];
+    vel.storage[4] = angularVelocity_.storage[1];
+    vel.storage[5] = angularVelocity_.storage[2];
+  }
 
-    double get linearDamping => _linearDamping;
-    void set linearDamping(linearDamping) {
-      _linearDamping = linearDamping;
-    }
-    double get angularDamping => _angularDamping;
-    void set angularDamping(angularDamping){
-      _angularDamping = angularDamping;
-    }
+  double get linearDamping => _linearDamping;
+  void set linearDamping(linearDamping) {
+    _linearDamping = linearDamping;
+  }
+  double get angularDamping => _angularDamping;
+  void set angularDamping(angularDamping) {
+    _angularDamping = angularDamping;
+  }
 
-    // read only, no getter needed
-    bool get kinematic => _kinematic;
-    //bool _kinematic;
+  // read only, no getter needed
+  bool get kinematic => _kinematic;
+  //bool _kinematic;
 
-    // read only, no getter needed
-    double get mass => _mass;
-    //double _mass;
+  // read only, no getter needed
+  double get mass => _mass;
+  //double _mass;
 
-    // read only, getter needed for unique vector.
-    // this value isn't used internally so is kept in a closure just for this getter.
-    //
-    Vector3 get inertia => _inertia;
-    Vector3 _inertia;
-
-
-    //double linearDamping;
-    //double angularDamping;
-    //double mass;
-    //Float32List inertia; // v3
-
-    //WebGLPhysicsPrivateBody _private;
+  // read only, getter needed for unique vector.
+  // this value isn't used internally so is kept in a closure just for this getter.
+  //
+  Vector3 get inertia => _inertia;
+  Vector3 _inertia;
 
 
-    WebGLPhysicsShape get shape => _shape;
+  //double linearDamping;
+  //double angularDamping;
+  //double mass;
+  //Float32List inertia; // v3
 
-    //calculateExtents = WebGLPhysicsCollisionObject.prototype.calculateExtents;
+  //WebGLPhysicsPrivateBody _private;
 
-    //calculateTransform = WebGLPhysicsCollisionObject.prototype.calculateTransform;
 
-    /*WebGLPhysicsRigidBody clone() {
+  WebGLPhysicsShape get shape => _shape;
+
+  //calculateExtents = WebGLPhysicsCollisionObject.prototype.calculateExtents;
+
+  //calculateTransform = WebGLPhysicsCollisionObject.prototype.calculateTransform;
+
+  /*WebGLPhysicsRigidBody clone() {
         return WebGLPhysicsRigidBody.create(this);
     }*/
 
-    WebGLPhysicsRigidBody clone() {
-      return new WebGLPhysicsRigidBody(
-          shape: shape,
-          transform: _transform.clone(),
-          //linearVelocity: _linearVelocity,
-          //angularVelocity: _angularVelocity,
-          userData: userData,
-          mask: mask,
-          group: group,
-          kinematic: kinematic,
-          inertia: inertia,
-          mass: mass,
-          friction: friction,
-          restitution: restitution,
-          linearDamping: linearDamping,
-          angularDamping: angularDamping,
-          //frozen: _frozen,
-          active: active
-          //fixedRotation: fixedRotation,
-          //permitSleep: permitSleep,
-          //onPreSolveContact: _onPreSolveContact,
-          //onAddedContacts,
-          //onProcessedContacts,
-          //onRemovedContacts
-          );
+  WebGLPhysicsRigidBody clone() {
+    return new WebGLPhysicsRigidBody(
+    shape: shape,
+     transform: _transform.clone(),
+     //linearVelocity: _linearVelocity,
+    //angularVelocity: _angularVelocity,
+    userData: userData,
+     mask: mask,
+     group: group,
+     kinematic: kinematic,
+     inertia: inertia,
+     mass: mass,
+     friction: friction,
+     restitution: restitution,
+     linearDamping: linearDamping,
+     angularDamping: angularDamping,
+     //frozen: _frozen,
+    active: active
+    //fixedRotation: fixedRotation,
+    //permitSleep: permitSleep,
+    //onPreSolveContact: _onPreSolveContact,
+    //onAddedContacts,
+    //onProcessedContacts,
+    //onRemovedContacts
+    );
+  }
+
+
+  WebGLPhysicsRigidBody({
+  WebGLPhysicsShape shape, 
+  Matrix43 transform, 
+  Vector3 linearVelocity, 
+  Vector3 angularVelocity, 
+  dynamic this.userData, 
+  int mask: WebGLPhysicsDevice.FILTER_ALL, 
+  int group: WebGLPhysicsDevice.FILTER_DYNAMIC, 
+  bool kinematic: false, 
+  Vector3 inertia, 
+  double mass: 0.5, 
+  double friction: 0.5, 
+  double restitution: 0.0, 
+  double linearDamping: 0.0, 
+  double angularDamping: 0.0, 
+  bool frozen, 
+  bool active: true, 
+  bool fixedRotation: false, 
+  bool permitSleep, 
+  ContactCallback onPreSolveContact, 
+  ContactCallback onAddedContacts, 
+  ContactCallback onProcessedContacts, 
+  ContactCallback onRemovedContacts})
+      : super(
+      //WebGLPhysicsCollisionObject publicObject,
+      shape,
+       transform,
+       linearVelocity,
+       angularVelocity,
+       friction,
+       restitution,
+       linearDamping,
+       angularDamping) {
+    //retr._private = r;
+    if (inertia != null) {
+      _inertia = inertia.clone();
+    } else {
+      _inertia = shape._inertia.clone().scale(mass);
     }
+    var r = this;
 
+    _kinematic = kinematic;
+    // ------------------------------
+    // initialise private properties of RigidBody.
 
-    WebGLPhysicsRigidBody({
-      WebGLPhysicsShape shape,
-      Matrix43 transform,
-      Vector3 linearVelocity,
-      Vector3 angularVelocity,
-      dynamic this.userData,
-      int mask: WebGLPhysicsDevice.FILTER_ALL,
-      int group: WebGLPhysicsDevice.FILTER_DYNAMIC,
-      bool kinematic: false,
-      Vector3 inertia,
-      double mass: 0.5,
-      double friction: 0.5,
-      double restitution: 0.0,
-      double linearDamping: 0.0,
-      double angularDamping: 0.0,
-      bool frozen,
-      bool active: true,
-      bool fixedRotation: false,
-      bool permitSleep,
-      ContactCallback onPreSolveContact,
-      ContactCallback onAddedContacts,
-      ContactCallback onProcessedContacts,
-      ContactCallback onRemovedContacts}) : super(
-          //WebGLPhysicsCollisionObject publicObject,
-          shape,
-          transform,
-          linearVelocity,
-          angularVelocity,
-          friction,
-          restitution,
-          linearDamping,
-          angularDamping) {
-        //retr._private = r;
-        if(inertia != null) {
-          _inertia = inertia.clone();
-        } else {
-          _inertia = shape._inertia.clone().scale(mass);
-        }
-        var r = this;
+    _group = group;
+    _mask = mask;
+    _active = (active != null) ? active : (frozen != null) ? (frozen) : true;
 
-        _kinematic = kinematic;
-        // ------------------------------
-        // initialise private properties of RigidBody.
+    _kinematic = kinematic;
+    _fixedRotation = kinematic || fixedRotation;
 
-        _group = group;
-        _mask = mask;
-        _active = (active != null) ? active : (frozen != null) ? (frozen) : true;
+    _inverseInertiaLocal = (r._fixedRotation ? new Vector3.zero() : new Vector3(1.0 / inertia[0], 1.0 / inertia[1], 1.0 / inertia[2]));
+    _inverseInertia = new Matrix3.identity();//MathHelper.m33BuildIdentity();
 
-        _kinematic = kinematic;
-        _fixedRotation = kinematic || fixedRotation;
+    _mass = mass;
+    _inverseMass = (kinematic ? 0.0 : (1.0 / r.mass));
 
-        _inverseInertiaLocal = (r._fixedRotation ? new Vector3.zero() : new Vector3(1.0 / inertia[0], 1.0 / inertia[1], 1.0 / inertia[2]));
-        _inverseInertia = new Matrix3.identity();//MathHelper.m33BuildIdentity();
+    _collisionObject = false;
 
-        _mass = mass;
-        _inverseMass = (kinematic ? 0.0 : (1.0 / r.mass));
+    // Kinematic object is not permitted to sleep in the normal sense.
+    _permitSleep = (permitSleep != null) ? permitSleep : (!kinematic);
 
-        _collisionObject = false;
+    // Kinematic object is not subject to manipulation by continous collisions.
+    _sweepFrozen = kinematic;
 
-        // Kinematic object is not permitted to sleep in the normal sense.
-        _permitSleep = (permitSleep != null) ? permitSleep : (!kinematic);
-
-        // Kinematic object is not subject to manipulation by continous collisions.
-        _sweepFrozen = kinematic;
-
-        // prepare for contact callbacks
-        if (onPreSolveContact != null ||
-            onAddedContacts != null ||
-            onProcessedContacts != null ||
-            onRemovedContacts != null) {
-        _contactCallbacks = new WebGLPhysicsContactCallbacks(
-          mask: mask,
-          trigger: false,
-          onAddedContacts: onAddedContacts,
-          onPreSolveContact: onPreSolveContact,
-          onProcessedContacts: onProcessedContacts,
-          onRemovedContacts: onRemovedContacts);
-        } else {
-          _contactCallbacks = null;
-        }
+    // prepare for contact callbacks
+    if (onPreSolveContact != null ||
+     onAddedContacts != null ||
+     onProcessedContacts != null ||
+     onRemovedContacts != null) {
+      _contactCallbacks = new WebGLPhysicsContactCallbacks(
+      mask: mask,
+       trigger: false,
+       onAddedContacts: onAddedContacts,
+       onPreSolveContact: onPreSolveContact,
+       onProcessedContacts: onProcessedContacts,
+       onRemovedContacts: onRemovedContacts);
+    } else {
+      _contactCallbacks = null;
     }
+  }
 }
 
 //var r = new WebGLPhysicsPrivateBody(params, retr);

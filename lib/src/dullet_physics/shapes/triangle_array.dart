@@ -1,16 +1,16 @@
 part of dullet_physics;
 
 class WebGLPhysicsTriangleArray extends WebGLPhysicsPrivateTriangleArray /*implements PhysicsTriangleArray*/ {
+  static const TRIANGLE_SIZE = 17;
+  //static version = 1;
 
-    //static version = 1;
-
-    // PhysicsTriangleArray
+  // PhysicsTriangleArray
   //Float32List vertices; // getter for _private.vertices
   //Uint16List indices;          // Uint16Array / Uint32Array
 
   //WebGLPhysicsPrivateTriangleArray _private;
 
-  WebGLPhysicsTriangleArray(List<double> inVertices, List<int> inIndices, bool dontCopy,{ var minExtent, var maxExtent}) {
+  WebGLPhysicsTriangleArray(List<double> inVertices, List<int> inIndices, bool dontCopy, {var minExtent, var maxExtent}) {
     //var rett = this;//new WebGLPhysicsTriangleArray();
     var t = this;
     //rett._private = t;
@@ -29,7 +29,7 @@ class WebGLPhysicsTriangleArray extends WebGLPhysicsPrivateTriangleArray /*imple
     var v2;
 
     if (!minExtent || !maxExtent)
-    {
+     {
       var min0 = vertices[0];
       var min1 = vertices[1];
       var min2 = vertices[2];
@@ -38,33 +38,39 @@ class WebGLPhysicsTriangleArray extends WebGLPhysicsPrivateTriangleArray /*imple
       var max2 = min2;
       var maxN = vertices.length;
       for (var n = 3; n < maxN; n += 3)
-      {
+       {
         v0 = vertices[n];
         v1 = vertices[n + 1];
         v2 = vertices[n + 2];
         if (min0 > v0)
-        {
+         {
           min0 = v0;
         }
-        else if (max0 < v0)
-        {
-          max0 = v0;
+         else {
+          if (max0 < v0)
+           {
+            max0 = v0;
+          }
         }
         if (min1 > v1)
-        {
+         {
           min1 = v1;
         }
-        else if (max1 < v1)
-        {
-          max1 = v1;
+         else {
+          if (max1 < v1)
+           {
+            max1 = v1;
+          }
         }
         if (min2 > v2)
-        {
+         {
           min2 = v2;
         }
-        else if (max2 < v2)
-        {
-          max2 = v2;
+         else {
+          if (max2 < v2)
+           {
+            max2 = v2;
+          }
         }
       }
       minExtent = [min0, min1, min2];
@@ -110,7 +116,7 @@ class WebGLPhysicsTriangleArray extends WebGLPhysicsPrivateTriangleArray /*imple
 
     // Only use spatial map if we do not have a trivial number of triangles.
     if (numTriangles >= 8)
-    {
+     {
       spatialMap = new AabbTree(true);
     }
 
@@ -182,7 +188,7 @@ class WebGLPhysicsTriangleArray extends WebGLPhysicsPrivateTriangleArray /*imple
 
       // If building AABBTree, store node
       if (spatialMap)
-      {
+       {
         extents = new Float32List(6);
         extents[0] = MathHelper.min(v00, v10, v20);
         extents[1] = MathHelper.min(v01, v11, v21);
@@ -192,21 +198,21 @@ class WebGLPhysicsTriangleArray extends WebGLPhysicsPrivateTriangleArray /*imple
         extents[5] = MathHelper.max(v02, v12, v22);
 
         var triNode = {
-                       "index": itri
+        "index": itri
         };
         spatialMap.add(triNode, extents);
       }
     }
 
     if (spatialMap)
-    {
+     {
       spatialMap.finalize();
     }
 
     t.triangles = triangles;
     t.spatialMap = spatialMap;
 
-    //return rett;
+  //return rett;
 
   }
 
@@ -413,136 +419,136 @@ return rett;
 }*/
 
 class WebGLPhysicsPrivateTriangleArray {
-    //static version = 1;
+  //static version = 1;
 
-    // Size of each 'triangle' in triangles array.
-    static const TRIANGLE_SIZE = 17; // prototype
+  // Size of each 'triangle' in triangles array.
+  static const TRIANGLE_SIZE = 17; // prototype
 
-    //WebGLPhysicsTriangleArray _public;
-    double numVertices;
-    Float32List extents;
-    Float32List vertices;
-    Uint16List indices;   // Uint16Array / Uint32Array
-    Float32List triangles;
-    int numTriangles;
-    AabbTree spatialMap;
+  //WebGLPhysicsTriangleArray _public;
+  double numVertices;
+  Float32List extents;
+  Float32List vertices;
+  Uint16List indices; // Uint16Array / Uint32Array
+  Float32List triangles;
+  int numTriangles;
+  AabbTree spatialMap;
 
-    rayTest(ray) {
-        var triangles = this.triangles;
-        var spatialMap = this.spatialMap;
+  rayTest(ray) {
+    var triangles = this.triangles;
+    var spatialMap = this.spatialMap;
 
-        RayHit rayCallback(tree, triangle, ray, unusedAABBDistance, upperBound) {
-            var dir = ray.direction;
-            var dir0 = dir[0];
-            var dir1 = dir[1];
-            var dir2 = dir[2];
+    RayHit rayCallback(tree, triangle, ray, unusedAABBDistance, upperBound) {
+      var dir = ray.direction;
+      var dir0 = dir[0];
+      var dir1 = dir[1];
+      var dir2 = dir[2];
 
-            var origin = ray.origin;
-            var o0 = origin[0];
-            var o1 = origin[1];
-            var o2 = origin[2];
+      var origin = ray.origin;
+      var o0 = origin[0];
+      var o1 = origin[1];
+      var o2 = origin[2];
 
-            var i = triangle.index;
-            var n0 = triangles[i];
-            var n1 = triangles[i + 1];
-            var n2 = triangles[i + 2];
+      var i = triangle.index;
+      var n0 = triangles[i];
+      var n1 = triangles[i + 1];
+      var n2 = triangles[i + 2];
 
-            //var dot = VMath.v3Dot(ray.direction, normal);
-            var dot = ((dir0 * n0) + (dir1 * n1) + (dir2 * n2));
-            // If ray is parallel to triangle plane
-            // Assume it cannot intersect triangle
-            if ((dot * dot) < WebGLPhysicsConfig.COPLANAR_THRESHOLD)
-            {
-                return null;
-            }
+      //var dot = VMath.v3Dot(ray.direction, normal);
+      var dot = ((dir0 * n0) + (dir1 * n1) + (dir2 * n2));
+      // If ray is parallel to triangle plane
+      // Assume it cannot intersect triangle
+      if ((dot * dot) < WebGLPhysicsConfig.COPLANAR_THRESHOLD)
+       {
+        return null;
+      }
 
-            var d = triangles[i + 16];
-            var v00 = triangles[i + 3];
-            var v01 = triangles[i + 4];
-            var v02 = triangles[i + 5];
-            //var distance = VMath.v3Dot(VMath.v3Sub(v0, ray.origin), normal) / dot;
-            var distance = ((d - ((o0 * n0) + (o1 * n1) + (o2 * n2))) / dot);
-            if (distance < 0 || distance >= upperBound)
-            {
-                return null;
-            }
+      var d = triangles[i + 16];
+      var v00 = triangles[i + 3];
+      var v01 = triangles[i + 4];
+      var v02 = triangles[i + 5];
+      //var distance = VMath.v3Dot(VMath.v3Sub(v0, ray.origin), normal) / dot;
+      var distance = ((d - ((o0 * n0) + (o1 * n1) + (o2 * n2))) / dot);
+      if (distance < 0 || distance >= upperBound)
+       {
+        return null;
+      }
 
-            // Make sure normal points correct direction for ray cast result
-            if (dot > 0)
-            {
-                //normal = VMath.v3Neg(normal);
-                n0 = -n0;
-                n1 = -n1;
-                n2 = -n2;
+      // Make sure normal points correct direction for ray cast result
+      if (dot > 0)
+       {
+        //normal = VMath.v3Neg(normal);
+        n0 = -n0;
+        n1 = -n1;
+        n2 = -n2;
 
-                dot = -dot;
-            }
+        dot = -dot;
+      }
 
-            //var hitPoint = VMath.v3Add(ray.origin, VMath.v3ScalarMul(ray.direction, distance));
-            var hit0 = (o0 + (dir0 * distance));
-            var hit1 = (o1 + (dir1 * distance));
-            var hit2 = (o2 + (dir2 * distance));
+      //var hitPoint = VMath.v3Add(ray.origin, VMath.v3ScalarMul(ray.direction, distance));
+      var hit0 = (o0 + (dir0 * distance));
+      var hit1 = (o1 + (dir1 * distance));
+      var hit2 = (o2 + (dir2 * distance));
 
-            // Compute barycentric coordinates in triangle.
-            //var w = VMath.v3Sub(hitPoint, v0);
-            var wx = (hit0 - v00);
-            var wy = (hit1 - v01);
-            var wz = (hit2 - v02);
+      // Compute barycentric coordinates in triangle.
+      //var w = VMath.v3Sub(hitPoint, v0);
+      var wx = (hit0 - v00);
+      var wy = (hit1 - v01);
+      var wz = (hit2 - v02);
 
-            var dotuu = triangles[i + 12];
-            var dotvv = triangles[i + 13];
-            var dotuv = triangles[i + 14];
-            var negLimit = triangles[i + 15];
+      var dotuu = triangles[i + 12];
+      var dotvv = triangles[i + 13];
+      var dotuv = triangles[i + 14];
+      var negLimit = triangles[i + 15];
 
-            var u0 = triangles[i + 6];
-            var u1 = triangles[i + 7];
-            var u2 = triangles[i + 8];
-            var v0 = triangles[i + 9];
-            var v1 = triangles[i + 10];
-            var v2 = triangles[i + 11];
-            //var dotwu = VMath.v3Dot(w, u);
-            //var dotwv = VMath.v3Dot(w, v);
-            var dotwu = (wx * u0) + (wy * u1) + (wz * u2);
-            var dotwv = (wx * v0) + (wy * v1) + (wz * v2);
+      var u0 = triangles[i + 6];
+      var u1 = triangles[i + 7];
+      var u2 = triangles[i + 8];
+      var v0 = triangles[i + 9];
+      var v1 = triangles[i + 10];
+      var v2 = triangles[i + 11];
+      //var dotwu = VMath.v3Dot(w, u);
+      //var dotwv = VMath.v3Dot(w, v);
+      var dotwu = (wx * u0) + (wy * u1) + (wz * u2);
+      var dotwv = (wx * v0) + (wy * v1) + (wz * v2);
 
-            var alpha = ((dotuv * dotwv) - (dotvv * dotwu));
-            if (alpha > 0 || alpha < negLimit)
-            {
-                return null;
-            }
+      var alpha = ((dotuv * dotwv) - (dotvv * dotwu));
+      if (alpha > 0 || alpha < negLimit)
+       {
+        return null;
+      }
 
-            var beta  = ((dotuv * dotwu) - (dotuu * dotwv));
-            if (beta > 0 || (alpha + beta) < negLimit)
-            {
-                return null;
-            }
+      var beta = ((dotuv * dotwu) - (dotuu * dotwv));
+      if (beta > 0 || (alpha + beta) < negLimit)
+       {
+        return null;
+      }
 
-            return new RayHit(new Vector3(hit0, hit1, hit2), new Vector3(n0, n1, n2), distance);
-        }
-
-        if (spatialMap) {
-            return AabbTree.rayTest([spatialMap], ray, rayCallback);
-        } else {
-            var minimumResult = null;
-            var upperBound = ray.maxFactor;
-
-            var triNode = {
-                "index": 0
-            };
-            var i;
-            var numTris = this.numTriangles * WebGLPhysicsTriangleArray.TRIANGLE_SIZE;
-            for (i = 0; i < numTris; i += WebGLPhysicsTriangleArray.TRIANGLE_SIZE)
-            {
-                triNode['index'] = i;
-                var result = rayCallback(null, triNode, ray, 0, upperBound);
-                if (result)
-                {
-                    minimumResult = result;
-                    upperBound = minimumResult.factor;
-                }
-            }
-
-            return minimumResult;
-        }
+      return new RayHit(new Vector3(hit0, hit1, hit2), new Vector3(n0, n1, n2), distance);
     }
+
+    if (spatialMap) {
+      return AabbTree.rayTest([spatialMap], ray, rayCallback);
+    } else {
+      var minimumResult = null;
+      var upperBound = ray.maxFactor;
+
+      var triNode = {
+      "index": 0
+      };
+      var i;
+      var numTris = this.numTriangles * WebGLPhysicsTriangleArray.TRIANGLE_SIZE;
+      for (i = 0; i < numTris; i += WebGLPhysicsTriangleArray.TRIANGLE_SIZE)
+       {
+        triNode['index'] = i;
+        var result = rayCallback(null, triNode, ray, 0, upperBound);
+        if (result)
+         {
+          minimumResult = result;
+          upperBound = minimumResult.factor;
+        }
+      }
+
+      return minimumResult;
+    }
+  }
 }

@@ -39,12 +39,14 @@ part of dullet_physics;
 // Contacts are thus instead allocated an deallocated with no
 // create method.
 //
-class  WebGLPhysicsContact /*extends Float32Array*/ {
+class WebGLPhysicsContact /*extends Float32Array*/ {
   final Float32List _storage = new Float32List(52);
 
-  double operator[](int i) => _storage[i];
+  double operator [](int i) => _storage[i];
 
-  void operator[]=(int i, double v) { _storage[i] = v; }
+  void operator []=(int i, double v) {
+    _storage[i] = v;
+  }
 
   static final List<WebGLPhysicsContact> _contactPool = <WebGLPhysicsContact>[];//: <WebGLPhysicsContact[]>[],
 
@@ -52,23 +54,23 @@ class  WebGLPhysicsContact /*extends Float32Array*/ {
   static final List<WebGLPhysicsContact> _callbackContacts = <WebGLPhysicsContact>[];//: <WebGLPhysicsPublicContact[]>[],
 
   static WebGLPhysicsContact allocate() {
-      WebGLPhysicsContact contact;
-      if (_contactPool.isEmpty)
-      {
-          contact = new WebGLPhysicsContact();//new Float32List(52);
-      } else {
-          contact = _contactPool.removeLast();
-      }
+    WebGLPhysicsContact contact;
+    if (_contactPool.isEmpty)
+     {
+      contact = new WebGLPhysicsContact();//new Float32List(52);
+    } else {
+      contact = _contactPool.removeLast();
+    }
 
-      contact._storage[51] = 1.0; // new contact
+    contact._storage[51] = 1.0; // new contact
 
-      return contact;
+    return contact;
   }
 
-  static void deallocate(WebGLPhysicsContact contact){
-      _contactPool.add(contact);
-      // Contact jAccN is cached between updates. Needs to be reset if contact is re-used.
-      contact[40] = 0.0;
+  static void deallocate(WebGLPhysicsContact contact) {
+    _contactPool.add(contact);
+    // Contact jAccN is cached between updates. Needs to be reset if contact is re-used.
+    contact[40] = 0.0;
   }
 
   Vector3 get localPointOnA {

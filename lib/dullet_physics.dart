@@ -51,28 +51,28 @@ class WebGLPhysicsPerformance {
 }
 
 class WebGLPhysicsNarrowCache extends WebGLPhysicsTOIEvent {
-    //Vector3 axis = new Vector3.zero(); // v3
-    //WebGLPhysicsShape shapeA; // TODO: what is this
-    //WebGLPhysicsShape shapeB; // TODO: what is this
-    //Vector3 closestA = new Vector3.zero(); // v3
-    //Vector3 closestB = new Vector3.zero(); // v3
-    WebGLPhysicsNarrowCache() {
-      axis = new Vector3.zero(); // v3
-      closestA = new Vector3.zero(); // v3
-      closestB = new Vector3.zero(); // v3
-    }
-    WebGLPhysicsNarrowCache.fromData(
-        Vector3 axis,
-        WebGLPhysicsShape shapeA,
-        WebGLPhysicsShape shapeB,
-        Vector3 closestA,
-        Vector3 closestB) {
-      this.axis = axis;
-      this.shapeA = shapeA;
-      this.shapeB = shapeB;
-      this.closestA = closestA;
-      this.closestB = closestB;
-    }
+  //Vector3 axis = new Vector3.zero(); // v3
+  //WebGLPhysicsShape shapeA; // TODO: what is this
+  //WebGLPhysicsShape shapeB; // TODO: what is this
+  //Vector3 closestA = new Vector3.zero(); // v3
+  //Vector3 closestB = new Vector3.zero(); // v3
+  WebGLPhysicsNarrowCache() {
+    axis = new Vector3.zero(); // v3
+    closestA = new Vector3.zero(); // v3
+    closestB = new Vector3.zero(); // v3
+  }
+  WebGLPhysicsNarrowCache.fromData(
+  Vector3 axis, 
+  WebGLPhysicsShape shapeA, 
+  WebGLPhysicsShape shapeB, 
+  Vector3 closestA, 
+  Vector3 closestB) {
+    this.axis = axis;
+    this.shapeA = shapeA;
+    this.shapeB = shapeB;
+    this.closestA = closestA;
+    this.closestB = closestB;
+  }
 
 }
 class FakeBody {
@@ -83,11 +83,11 @@ class FakeBody {
 
 
 class Ray {
-  Ray(this.origin,this.direction,this.maxFactor);
+  Ray(this.origin, this.direction, this.maxFactor);
   Vector3 origin;
   Vector3 direction;
   double maxFactor;
-  //int mask;
+//int mask;
 }
 
 
@@ -171,94 +171,94 @@ class Matrix43 {
     dest.storage[6] = m2;
     dest.storage[7] = m5;
     dest.storage[8] = m8;
-    dest.storage[9]  = -((px * m0) + (py * m1) + (pz * m2));
+    dest.storage[9] = -((px * m0) + (py * m1) + (pz * m2));
     dest.storage[10] = -((px * m3) + (py * m4) + (pz * m5));
     dest.storage[11] = -((px * m6) + (py * m7) + (pz * m8));
     return dest;
   }
   Matrix43 multiply(Matrix43 other, Matrix43 dest) {
-    var a0  = storage[0];
-    var a1  = storage[1];
-    var a2  = storage[2];
-    var a3  = storage[3];
-    var a4  = storage[4];
-    var a5  = storage[5];
-    var a6  = storage[6];
-    var a7  = storage[7];
-    var a8  = storage[8];
-    var a9  = storage[9];
+    var a0 = storage[0];
+    var a1 = storage[1];
+    var a2 = storage[2];
+    var a3 = storage[3];
+    var a4 = storage[4];
+    var a5 = storage[5];
+    var a6 = storage[6];
+    var a7 = storage[7];
+    var a8 = storage[8];
+    var a9 = storage[9];
     var a10 = storage[10];
     var a11 = storage[11];
 
-    var b0  = other.storage[0];
-    var b1  = other.storage[1];
-    var b2  = other.storage[2];
-    var b3  = other.storage[3];
-    var b4  = other.storage[4];
-    var b5  = other.storage[5];
-    var b6  = other.storage[6];
-    var b7  = other.storage[7];
-    var b8  = other.storage[8];
+    var b0 = other.storage[0];
+    var b1 = other.storage[1];
+    var b2 = other.storage[2];
+    var b3 = other.storage[3];
+    var b4 = other.storage[4];
+    var b5 = other.storage[5];
+    var b6 = other.storage[6];
+    var b7 = other.storage[7];
+    var b8 = other.storage[8];
 
-    dest.storage[0] =  (b0 * a0 + b3 * a1 + b6 * a2);
-    dest.storage[1] =  (b1 * a0 + b4 * a1 + b7 * a2);
-    dest.storage[2] =  (b2 * a0 + b5 * a1 + b8 * a2);
-    dest.storage[3] =  (b0 * a3 + b3 * a4 + b6 * a5);
-    dest.storage[4] =  (b1 * a3 + b4 * a4 + b7 * a5);
-    dest.storage[5] =  (b2 * a3 + b5 * a4 + b8 * a5);
-    dest.storage[6] =  (b0 * a6 + b3 * a7 + b6 * a8);
-    dest.storage[7] =  (b1 * a6 + b4 * a7 + b7 * a8);
-    dest.storage[8] =  (b2 * a6 + b5 * a7 + b8 * a8);
-    dest.storage[9]  = (b0 * a9 + b3 * a10 + b6 * a11 + other.storage[9]);
+    dest.storage[0] = (b0 * a0 + b3 * a1 + b6 * a2);
+    dest.storage[1] = (b1 * a0 + b4 * a1 + b7 * a2);
+    dest.storage[2] = (b2 * a0 + b5 * a1 + b8 * a2);
+    dest.storage[3] = (b0 * a3 + b3 * a4 + b6 * a5);
+    dest.storage[4] = (b1 * a3 + b4 * a4 + b7 * a5);
+    dest.storage[5] = (b2 * a3 + b5 * a4 + b8 * a5);
+    dest.storage[6] = (b0 * a6 + b3 * a7 + b6 * a8);
+    dest.storage[7] = (b1 * a6 + b4 * a7 + b7 * a8);
+    dest.storage[8] = (b2 * a6 + b5 * a7 + b8 * a8);
+    dest.storage[9] = (b0 * a9 + b3 * a10 + b6 * a11 + other.storage[9]);
     dest.storage[10] = (b1 * a9 + b4 * a10 + b7 * a11 + other.storage[10]);
     dest.storage[11] = (b2 * a9 + b5 * a10 + b8 * a11 + other.storage[11]);
 
     return dest;
   }
   Matrix4 multiplyMatrix4(Matrix4 mat, Matrix4 out) {
-  var a0  = storage[0];
-  var a1  = storage[1];
-  var a2  = storage[2];
-  var a3  = storage[3];
-  var a4  = storage[4];
-  var a5  = storage[5];
-  var a6  = storage[6];
-  var a7  = storage[7];
-  var a8  = storage[8];
-  var a9  = storage[9];
-  var a10 = storage[10];
-  var a11 = storage[11];
+    var a0 = storage[0];
+    var a1 = storage[1];
+    var a2 = storage[2];
+    var a3 = storage[3];
+    var a4 = storage[4];
+    var a5 = storage[5];
+    var a6 = storage[6];
+    var a7 = storage[7];
+    var a8 = storage[8];
+    var a9 = storage[9];
+    var a10 = storage[10];
+    var a11 = storage[11];
 
-  var b0  = mat.storage[0];
-  var b1  = mat.storage[1];
-  var b2  = mat.storage[2];
-  var b3  = mat.storage[3];
-  var b4  = mat.storage[4];
-  var b5  = mat.storage[5];
-  var b6  = mat.storage[6];
-  var b7  = mat.storage[7];
-  var b8  = mat.storage[8];
-  var b9  = mat.storage[9];
-  var b10 = mat.storage[10];
-  var b11 = mat.storage[11];
-  out.storage[0] =  (b0 * a0 + b4 * a1 + b8  * a2);
-  out.storage[1] =  (b1 * a0 + b5 * a1 + b9  * a2);
-  out.storage[2] =  (b2 * a0 + b6 * a1 + b10 * a2);
-  out.storage[3] =  (b3 * a0 + b7 * a1 + b11 * a2);
-  out.storage[4] =  (b0 * a3 + b4 * a4 + b8  * a5);
-  out.storage[5] =  (b1 * a3 + b5 * a4 + b9  * a5);
-  out.storage[6] =  (b2 * a3 + b6 * a4 + b10 * a5);
-  out.storage[7] =  (b3 * a3 + b7 * a4 + b11 * a5);
-  out.storage[8] =  (b0 * a6 + b4 * a7 + b8  * a8);
-  out.storage[9]  = (b1 * a6 + b5 * a7 + b9  * a8);
-  out.storage[10] = (b2 * a6 + b6 * a7 + b10 * a8);
-  out.storage[11] = (b3 * a6 + b7 * a7 + b11 * a8);
-  out.storage[12] = (b0 * a9 + b4 * a10 + b8  * a11 + mat.storage[12]);
-  out.storage[13] = (b1 * a9 + b5 * a10 + b9  * a11 + mat.storage[13]);
-  out.storage[14] = (b2 * a9 + b6 * a10 + b10 * a11 + mat.storage[14]);
-  out.storage[15] = (b3 * a9 + b7 * a10 + b11 * a11 + mat.storage[15]);
-  return out;
-}
+    var b0 = mat.storage[0];
+    var b1 = mat.storage[1];
+    var b2 = mat.storage[2];
+    var b3 = mat.storage[3];
+    var b4 = mat.storage[4];
+    var b5 = mat.storage[5];
+    var b6 = mat.storage[6];
+    var b7 = mat.storage[7];
+    var b8 = mat.storage[8];
+    var b9 = mat.storage[9];
+    var b10 = mat.storage[10];
+    var b11 = mat.storage[11];
+    out.storage[0] = (b0 * a0 + b4 * a1 + b8 * a2);
+    out.storage[1] = (b1 * a0 + b5 * a1 + b9 * a2);
+    out.storage[2] = (b2 * a0 + b6 * a1 + b10 * a2);
+    out.storage[3] = (b3 * a0 + b7 * a1 + b11 * a2);
+    out.storage[4] = (b0 * a3 + b4 * a4 + b8 * a5);
+    out.storage[5] = (b1 * a3 + b5 * a4 + b9 * a5);
+    out.storage[6] = (b2 * a3 + b6 * a4 + b10 * a5);
+    out.storage[7] = (b3 * a3 + b7 * a4 + b11 * a5);
+    out.storage[8] = (b0 * a6 + b4 * a7 + b8 * a8);
+    out.storage[9] = (b1 * a6 + b5 * a7 + b9 * a8);
+    out.storage[10] = (b2 * a6 + b6 * a7 + b10 * a8);
+    out.storage[11] = (b3 * a6 + b7 * a7 + b11 * a8);
+    out.storage[12] = (b0 * a9 + b4 * a10 + b8 * a11 + mat.storage[12]);
+    out.storage[13] = (b1 * a9 + b5 * a10 + b9 * a11 + mat.storage[13]);
+    out.storage[14] = (b2 * a9 + b6 * a10 + b10 * a11 + mat.storage[14]);
+    out.storage[15] = (b3 * a9 + b7 * a10 + b11 * a11 + mat.storage[15]);
+    return out;
+  }
 
 
   Vector3 inverseOrthonormalTransformPoint(Vector3 v, Vector3 dst) {
@@ -301,16 +301,16 @@ class Matrix43 {
     var o1 = -o[1];
     var o2 = -o[2];
 
-    dst[0] =  m0;
-    dst[1] =  m1;
-    dst[2] =  m2;
-    dst[3] =  m3;
-    dst[4] =  m4;
-    dst[5] =  m5;
-    dst[6] =  m6;
-    dst[7] =  m7;
-    dst[8] =  m8;
-    dst[9]  = (m0 * o0 + m3 * o1 + m6 * o2 + m9);
+    dst[0] = m0;
+    dst[1] = m1;
+    dst[2] = m2;
+    dst[3] = m3;
+    dst[4] = m4;
+    dst[5] = m5;
+    dst[6] = m6;
+    dst[7] = m7;
+    dst[8] = m8;
+    dst[9] = (m0 * o0 + m3 * o1 + m6 * o2 + m9);
     dst[10] = (m1 * o0 + m4 * o1 + m7 * o2 + m10);
     dst[11] = (m2 * o0 + m5 * o1 + m8 * o2 + m11);
 
@@ -335,15 +335,17 @@ class Matrix43 {
     res[2] = storage[11];
     return res;
   }
-  Vector3 get position => new Vector3(storage[9],storage[10],storage[11]);
+  Vector3 get position => new Vector3(storage[9], storage[10], storage[11]);
 
-  double operator[](int i) => storage[i];
+  double operator [](int i) => storage[i];
 
-  void operator[]=(int i, double v) { storage[i] = v; }
+  void operator []=(int i, double v) {
+    storage[i] = v;
+  }
 
 
   String toString() =>
-'''[${storage[0]},${storage[1]},${storage[2]}]
+   '''[${storage[0]},${storage[1]},${storage[2]}]
 [${storage[3]},${storage[4]},${storage[5]}]
 [${storage[6]},${storage[7]},${storage[8]}]
 [${storage[9]},${storage[10]},${storage[11]}]''';
@@ -357,13 +359,13 @@ class Matrix43 {
 
 
 class RayHit {
-    double factor;
-    Vector3 hitPoint;
-    Vector3 hitNormal;
-    WebGLPhysicsCollisionObject collisionObject;
-    double distance;
-    WebGLPhysicsPrivateBody body;
-    RayHit(this.hitPoint,this.hitNormal,this.factor);
+  double factor;
+  Vector3 hitPoint;
+  Vector3 hitNormal;
+  WebGLPhysicsCollisionObject collisionObject;
+  double distance;
+  WebGLPhysicsPrivateBody body;
+  RayHit(this.hitPoint, this.hitNormal, this.factor);
 }
 
 
@@ -390,15 +392,15 @@ void calculateExtents(FakeBody fakeBody, Aabb3 extents) {
   var ct1 = transform[10];
   var ct2 = transform[11];
   if (center)
-  {
+   {
     var c0 = center[0];
     var c1 = center[1];
     var c2 = center[2];
 
     if (c0 != 0 ||
-        c1 != 0 ||
-        c2 != 0)
-    {
+     c1 != 0 ||
+     c2 != 0)
+     {
       ct0 += (m0 * c0 + m3 * c1 + m6 * c2);
       ct1 += (m1 * c0 + m4 * c1 + m7 * c2);
       ct2 += (m2 * c0 + m5 * c1 + m8 * c2);
@@ -406,18 +408,18 @@ void calculateExtents(FakeBody fakeBody, Aabb3 extents) {
   }
 
   // fails when h0, h1, h2 are infinite, as JS has 0 * infinity = NaN not 0!!!!
-      //var ht0 = ((m0 < 0 ? -m0 : m0) * h0 + (m3 < 0 ? -m3 : m3) * h1 + (m6 < 0 ? -m6 : m6) * h2);
+  //var ht0 = ((m0 < 0 ? -m0 : m0) * h0 + (m3 < 0 ? -m3 : m3) * h1 + (m6 < 0 ? -m6 : m6) * h2);
   //var ht1 = ((m1 < 0 ? -m1 : m1) * h0 + (m4 < 0 ? -m4 : m4) * h1 + (m7 < 0 ? -m7 : m7) * h2);
   //var ht2 = ((m2 < 0 ? -m2 : m2) * h0 + (m5 < 0 ? -m5 : m5) * h1 + (m8 < 0 ? -m8 : m8) * h2);
   var ht0 = ((m0 < 0.0 ? -m0 * h0 : m0 > 0.0 ? m0 * h0 : 0.0) +
-      (m3 < 0.0 ? -m3 * h1 : m3 > 0.0 ? m3 * h1 : 0.0) +
-      (m6 < 0.0 ? -m6 * h2 : m6 > 0.0 ? m6 * h2 : 0.0));
+   (m3 < 0.0 ? -m3 * h1 : m3 > 0.0 ? m3 * h1 : 0.0) +
+   (m6 < 0.0 ? -m6 * h2 : m6 > 0.0 ? m6 * h2 : 0.0));
   var ht1 = ((m1 < 0.0 ? -m1 * h0 : m1 > 0.0 ? m1 * h0 : 0.0) +
-      (m4 < 0.0 ? -m4 * h1 : m4 > 0.0 ? m4 * h1 : 0.0) +
-      (m7 < 0.0 ? -m7 * h2 : m7 > 0.0 ? m7 * h2 : 0.0));
+   (m4 < 0.0 ? -m4 * h1 : m4 > 0.0 ? m4 * h1 : 0.0) +
+   (m7 < 0.0 ? -m7 * h2 : m7 > 0.0 ? m7 * h2 : 0.0));
   var ht2 = ((m2 < 0.0 ? -m2 * h0 : m2 > 0.0 ? m2 * h0 : 0.0) +
-      (m5 < 0.0 ? -m5 * h1 : m5 > 0.0 ? m5 * h1 : 0.0) +
-      (m8 < 0.0 ? -m8 * h2 : m8 > 0.0 ? m8 * h2 : 0.0));
+   (m5 < 0.0 ? -m5 * h1 : m5 > 0.0 ? m5 * h1 : 0.0) +
+   (m8 < 0.0 ? -m8 * h2 : m8 > 0.0 ? m8 * h2 : 0.0));
 
   extents.min.storage[0] = (ct0 - ht0);
   extents.min.storage[1] = (ct1 - ht1);

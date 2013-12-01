@@ -1,4 +1,4 @@
-//import 'package:game_loop/game_loop_isolate.dart';
+library debullet_test;
 import 'dart:async';
 import 'package:dullet_physics/dullet_physics.dart';
 import 'package:vector_math/vector_math.dart';

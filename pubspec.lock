@@ -5,6 +5,10 @@ packages:
     description: analyzer
     source: hosted
     version: "0.10.0"
+  analyzer_experimental:
+    description: analyzer_experimental
+    source: hosted
+    version: "0.8.6"
   args:
     description: args
     source: hosted

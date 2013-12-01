@@ -79,7 +79,7 @@ class MathHelper {
     dst[2] = (m[6] * v0 + m[7] * v1 + m[8] * v2);
     return dst;
   }
-  static Float32List m43TransformVector(Float32List m, Float32List v, [Float32List dst]){
+  static Float32List m43TransformVector(Float32List m, Float32List v, [Float32List dst]) {
     var res = dst;
     if (res == null) {
       res = new Float32List(3);
